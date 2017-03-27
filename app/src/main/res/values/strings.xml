@@ -1,0 +1,66 @@
+<!--
+  ~ Copyright (c) 2017 Martin Pfeffer
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~      http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+
+<resources>
+  <string name="app_name">Brutus</string>
+
+  <!-- Strings related to login -->
+  <string name="action_set_password">Set password</string>
+  <string name="prompt_retype_password">Retype Password</string>
+  <string name="error_password_not_secure">This password is too short</string>
+  <string name="error_password_not_matching">Passwords not matching</string>
+  <string name="permission_rationale">"Contacts permissions are needed for providing email
+        completions."
+    </string>
+  <string name="choose_strong_password_do_not_forget">Choose a strong password</string>
+  <string name="title_activity_main">MainActivity</string>
+
+  <string name="navigation_drawer_open">Open navigation drawer</string>
+  <string name="navigation_drawer_close">Close navigation drawer</string>
+
+  <!--wrapper-detail-activity-->
+  <string name="modified">Modified:</string>
+
+  <string name="action_settings">Settings</string>
+  <!--demo-->
+  <string name="sample_title">Title</string>
+  <string name="sample_preview">5 entries</string>
+  <string name="sample_field_description">Description</string>
+  <string name="sample_field_value">Value</string>
+  <!--field-->
+  <string name="field_mail_description">Mail</string>
+  <string name="field_website_description">Website</string>
+  <!--icon chooser popup-->
+  <string name="popup_icon_chooser_web">Set from website</string>
+  <string name="popup_icon_chooser_web_condensed">Web</string>
+  <string name="popup_icon_chooser_gallery">Set from gallery</string>
+  <string name="popup_icon_chooser_gallery_condensed">Gallery</string>
+  <!--field chooser popup-->
+  <string name="field_text">Text</string>
+  <string name="field_number">Number</string>
+  <string name="field_login">Login</string>
+  <string name="field_password">Password</string>
+  <string name="field_otp">One-Time-Password</string>
+  <string name="field_otp_condensed">OTP</string>
+  <string name="field_url">URL</string>
+  <string name="field_mail">E-Mail</string>
+  <string name="field_phone">Phone</string>
+  <string name="field_date">Date</string>
+  <string name="field_pin">PIN</string>
+  <string name="field_secret">Secret</string>
+  <string name="action_edit">Edit</string>
+  <string name="empty" />
+</resources>

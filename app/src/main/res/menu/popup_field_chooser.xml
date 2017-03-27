@@ -1,0 +1,73 @@
+<!--
+  ~ Copyright (c) 2017 Martin Pfeffer
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~      http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+  <item
+    android:id="@+id/popup_field_chooser_text"
+    android:title="@string/field_text"
+    android:titleCondensed="@string/field_text"
+    android:visible="true" />
+  <item
+    android:id="@+id/popup_field_chooser_number"
+    android:title="@string/field_number"
+    android:titleCondensed="@string/field_number"
+    android:visible="true" />
+  <item
+    android:id="@+id/popup_field_chooser_login"
+    android:title="@string/field_login"
+    android:titleCondensed="@string/field_login"
+    android:visible="true" />
+  <item
+    android:id="@+id/popup_field_chooser_password"
+    android:title="@string/field_password"
+    android:titleCondensed="@string/field_password"
+    android:visible="true" />
+  <item
+    android:id="@+id/popup_field_chooser_otp"
+    android:title="@string/field_otp"
+    android:titleCondensed="@string/field_otp_condensed"
+    android:visible="true" />
+  <item
+    android:id="@+id/popup_field_chooser_url"
+    android:title="@string/field_url"
+    android:titleCondensed="@string/field_url"
+    android:visible="true" />
+  <item
+    android:id="@+id/popup_field_chooser_mail"
+    android:title="@string/field_mail"
+    android:titleCondensed="@string/field_mail"
+    android:visible="true" />
+  <item
+    android:id="@+id/popup_field_chooser_phone"
+    android:title="@string/field_phone"
+    android:titleCondensed="@string/field_phone"
+    android:visible="true" />
+  <item
+    android:id="@+id/popup_field_chooser_date"
+    android:title="@string/field_date"
+    android:titleCondensed="@string/field_date"
+    android:visible="true" />
+  <item
+    android:id="@+id/popup_field_chooser_pin"
+    android:title="@string/field_pin"
+    android:titleCondensed="@string/field_pin"
+    android:visible="true" />
+  <item
+    android:id="@+id/popup_field_chooser_secret"
+    android:title="@string/field_secret"
+    android:titleCondensed="@string/field_secret"
+    android:visible="true" />
+</menu>
