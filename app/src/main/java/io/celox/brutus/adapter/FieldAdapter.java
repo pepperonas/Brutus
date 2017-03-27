@@ -140,7 +140,6 @@ public class FieldAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
         FieldViewHolderLogin(View view) {
             super(view);
             getActionLeft().setVisibility(View.VISIBLE);
-//            getActionRight().setVisibility(View.VISIBLE);
         }
     }
 
@@ -150,7 +149,6 @@ public class FieldAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
             super(view);
             getValue().setInputType(InputType.TYPE_TEXT_VARIATION_PASSWORD);
             getActionLeft().setVisibility(View.VISIBLE);
-//            getActionRight().setVisibility(View.VISIBLE);
         }
     }
 
@@ -159,7 +157,6 @@ public class FieldAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
         FieldViewHolderOtp(View view) {
             super(view);
             getActionLeft().setVisibility(View.VISIBLE);
-//            getActionRight().setVisibility(View.VISIBLE);
         }
     }
 
@@ -168,7 +165,6 @@ public class FieldAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
         FieldViewHolderUrl(View view) {
             super(view);
             getActionLeft().setImageDrawable(activity.getResources().getDrawable(R.drawable.earth));
-//            getActionLeft().setVisibility(View.VISIBLE);
             getActionRight().setVisibility(View.VISIBLE);
         }
     }
@@ -178,7 +174,6 @@ public class FieldAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
         FieldViewHolderMail(View view) {
             super(view);
             getValue().setInputType(InputType.TYPE_TEXT_VARIATION_EMAIL_ADDRESS);
-            //            getActionLeft().setVisibility(View.VISIBLE);
             getActionRight().setVisibility(View.VISIBLE);
         }
     }
@@ -188,7 +183,6 @@ public class FieldAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
         FieldViewHolderPhone(View view) {
             super(view);
             getValue().setInputType(InputType.TYPE_CLASS_PHONE);
-            //            getActionLeft().setVisibility(View.VISIBLE);
             getActionRight().setVisibility(View.VISIBLE);
         }
     }

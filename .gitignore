@@ -1,3 +1,6 @@
+# IMPORTANT
+release.properties
+
 *.iml
 .gradle
 /local.properties
