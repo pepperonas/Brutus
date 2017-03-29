@@ -36,18 +36,30 @@
   <ImageButton
     android:id="@+id/row_field_action_left"
     style="@style/row_field_action"
-    android:layout_toLeftOf="@+id/row_field_action_right"
-    android:layout_toStartOf="@+id/row_field_action_right"
+    android:layout_toLeftOf="@+id/row_field_action_right_frame"
+    android:layout_toStartOf="@+id/row_field_action_right_frame"
     android:contentDescription="@string/content_description_row_action_field_left"
     app:srcCompat="@drawable/ic_menu_camera"/>
 
-  <ImageButton
-    android:id="@+id/row_field_action_right"
-    style="@style/row_field_action"
+  <FrameLayout
+    android:id="@+id/row_field_action_right_frame"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
     android:layout_alignParentEnd="true"
     android:layout_alignParentRight="true"
-    android:contentDescription="@string/content_description_row_action_field_right"
-    app:srcCompat="@drawable/ic_menu_camera"/>
+    android:layout_centerVertical="true"
+    android:foregroundGravity="right">
+
+    <ImageButton
+      android:id="@+id/row_field_action_right"
+      android:layout_width="24dp"
+      android:layout_height="24dp"
+      android:layout_marginLeft="16dp"
+      android:background="?android:attr/selectableItemBackground"
+      android:contentDescription="@string/content_description_row_action_field_right"
+      app:srcCompat="@drawable/ic_menu_camera"/>
+
+  </FrameLayout>
 
   <ProgressBar
     android:id="@+id/row_field_progressbar"

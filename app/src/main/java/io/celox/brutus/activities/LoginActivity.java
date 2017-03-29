@@ -28,6 +28,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
+import android.view.View.OnClickListener;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
@@ -69,7 +70,12 @@ public class LoginActivity extends AppCompatActivity {
         mEtEnterPasswordAgain.setText("mm");
 
         Button btnSetPassword = (Button) findViewById(R.id.btn_set_password);
-        btnSetPassword.setOnClickListener(view -> attemptStorePassword());
+        btnSetPassword.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                attemptStorePassword();
+            }
+        });
 
         mViewSetPassword = findViewById(R.id.set_password_form);
 

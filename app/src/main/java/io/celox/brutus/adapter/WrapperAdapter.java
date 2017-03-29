@@ -21,6 +21,7 @@ import android.content.Intent;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -70,12 +71,19 @@ public class WrapperAdapter extends
     public void onBindViewHolder(WrapperViewHolder holder, int position) {
         Wrapper wrapper = wrappers.get(position);
         // TODO 2017-03-25 12-34: icon
-        holder.title.setText(wrapper.getTitle());
-        holder.preview.setText(String.valueOf(wrapper.getFields().size()));
-        holder.itemView.setOnClickListener(view -> {
-            // TODO 2017-03-25 12-34: pass id
-            activity.startActivity(new Intent(activity, WrapperDetailActivity.class));
-        });
+        try {
+            holder.title.setText(wrapper.getTitle());
+            holder.preview.setText(String.valueOf(wrapper.getFields().size()));
+            holder.itemView.setOnClickListener(new OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    // TODO 2017-03-25 12-34: pass id
+                    activity.startActivity(new Intent(activity, WrapperDetailActivity.class));
+                }
+            });
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
 

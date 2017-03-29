@@ -17,18 +17,23 @@
 package io.celox.brutus.adapter;
 
 import android.app.Activity;
+import android.graphics.Rect;
 import android.os.Handler;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.RecyclerView.ViewHolder;
 import android.text.InputType;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.TouchDelegate;
 import android.view.View;
+import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
+import com.pepperonas.andbasx.base.ToastUtils;
+import com.pepperonas.andbasx.system.DeviceUtils;
 import io.celox.brutus.R;
 import io.celox.brutus.custom.EditTextDispatched;
 import io.celox.brutus.model.Field;
@@ -110,6 +115,7 @@ public class FieldAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
 
     public class FieldViewHolderBase extends RecyclerView.ViewHolder {
 
+        public static final int DELEGATE_SIZE = 16;
         private TextView description;
         private EditTextDispatched value;
         private ImageView actionLeft;
@@ -117,13 +123,38 @@ public class FieldAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
 
         FieldViewHolderBase(View view) {
             super(view);
-            description = view.findViewById(R.id.row_field_description);
-            value = view.findViewById(R.id.row_field_value);
-            actionLeft = view.findViewById(R.id.row_field_action_left);
-            actionRight = view.findViewById(R.id.row_field_action_right);
+            description = (TextView) view.findViewById(R.id.row_field_description);
+            value = (EditTextDispatched) view.findViewById(R.id.row_field_value);
+            actionLeft = (ImageView) view.findViewById(R.id.row_field_action_left);
+            actionRight = (ImageView) view.findViewById(R.id.row_field_action_right);
             actionLeft.setVisibility(View.GONE);
             actionRight.setVisibility(mEditable ? View.VISIBLE : View.INVISIBLE);
             actionRight.setImageDrawable(mActivity.getResources().getDrawable(R.drawable.close));
+
+            try {
+                final View parentR = (View) actionRight.getParent();
+                parentR.post(() -> {
+                    Rect rectR = new Rect();
+                    actionRight.getHitRect(rectR);
+                    rectR.top -= DeviceUtils.dp2px(DELEGATE_SIZE);
+                    rectR.right += DeviceUtils.dp2px(DELEGATE_SIZE);
+                    rectR.bottom += DeviceUtils.dp2px(DELEGATE_SIZE);
+                    rectR.left -= DeviceUtils.dp2px(DELEGATE_SIZE);
+                    parentR.setTouchDelegate(new TouchDelegate(rectR, actionRight));
+                });
+                final View parentL = (View) actionLeft.getParent();
+                parentL.post(() -> {
+                    Rect rectL = new Rect();
+                    actionLeft.getHitRect(rectL);
+                    rectL.top -= DeviceUtils.dp2px(DELEGATE_SIZE);
+                    rectL.right += DeviceUtils.dp2px(DELEGATE_SIZE);
+                    rectL.bottom += DeviceUtils.dp2px(DELEGATE_SIZE);
+                    rectL.left -= DeviceUtils.dp2px(DELEGATE_SIZE);
+                    parentL.setTouchDelegate(new TouchDelegate(rectL, actionLeft));
+                });
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
 
             changeEditTextBehaviour(value, mEditable);
             value.requestFocus();
@@ -173,9 +204,54 @@ public class FieldAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
 
         FieldViewHolderPassword(View view) {
             super(view);
-            getValue().setInputType(InputType.TYPE_TEXT_VARIATION_PASSWORD);
+            getValue().setSingleLine(true);
+            showPasswordField(getValue());
             getActionLeft().setVisibility(View.VISIBLE);
+//            getActionLeft().setImageDrawable(mActivity.getResources().getDrawable(
+//                R.drawable.cube_outline));
+            getActionLeft().setImageDrawable(mActivity.getResources().getDrawable(
+                R.drawable.cube_outline));
+
+            ensureToggleVisibility(getValue(), getActionLeft());
+
+            ensureShowGenerator(getValue(), getActionLeft());
         }
+    }
+
+    private void ensureShowGenerator(EditTextDispatched etd, ImageView leftBtn) {
+        if (!mEditable) {
+            ensureToggleVisibility(etd, leftBtn);
+            return;
+        }
+        leftBtn.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                ToastUtils.toastShort("TODO: implement gen!");
+            }
+        });
+    }
+
+    private void ensureToggleVisibility(EditTextDispatched etd, ImageView leftBtn) {
+        if (mEditable) {
+            ensureShowGenerator(etd, leftBtn);
+            return;
+        }
+        leftBtn.setOnClickListener(v -> {
+            if (etd.getInputType() ==
+                InputType.TYPE_TEXT_VARIATION_VISIBLE_PASSWORD) {
+                hidePasswordField(etd);
+            } else {
+                showPasswordField(etd);
+            }
+            etd.setSelection(etd.length());
+            ((ImageButton) v).setImageDrawable(mActivity.getResources().getDrawable(
+                etd.getInputType() == InputType.TYPE_TEXT_VARIATION_VISIBLE_PASSWORD
+                    ? R.drawable.eye_off : R.drawable.eye));
+        });
+    }
+
+    private void showPasswordField(EditTextDispatched etd) {
+        etd.setInputType(InputType.TYPE_TEXT_VARIATION_VISIBLE_PASSWORD);
     }
 
     public class FieldViewHolderOtp extends FieldViewHolderBase {
@@ -186,7 +262,7 @@ public class FieldAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
             getActionRight().setVisibility(View.VISIBLE);
 
             if (!mAnimating) {
-                mTimer.schedule(mAnimationTask, 0, 1001);
+                mTimer.schedule(mAnimationTask, 0, 1000);
             }
         }
     }
@@ -232,7 +308,11 @@ public class FieldAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
         FieldViewHolderPin(View view) {
             super(view);
             getValue().setInputType(InputType.TYPE_NUMBER_VARIATION_PASSWORD);
-            getActionRight().setVisibility(View.VISIBLE);
+            getActionLeft().setVisibility(View.GONE);
+            getActionLeft().setImageDrawable(mActivity.getResources()
+                .getDrawable(R.drawable.close));
+
+            ensureToggleVisibility(getValue(), getActionLeft());
         }
     }
 
@@ -241,7 +321,11 @@ public class FieldAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
         FieldViewHolderSecret(View view) {
             super(view);
             getValue().setInputType(InputType.TYPE_CLASS_TEXT);
-            getActionRight().setVisibility(View.VISIBLE);
+            getActionLeft().setVisibility(View.GONE);
+            getActionLeft().setImageDrawable(mActivity.getResources()
+                .getDrawable(R.drawable.close));
+
+            ensureToggleVisibility(getValue(), getActionLeft());
         }
     }
 
@@ -356,9 +440,12 @@ public class FieldAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
     @Override
     public void onViewRecycled(ViewHolder holder) {
         super.onViewRecycled(holder);
-        EditTextDispatched value = holder.itemView.findViewById(R.id.row_field_value);
-        ImageButton actionLeft = holder.itemView.findViewById(R.id.row_field_action_left);
-        ImageButton actionRight = holder.itemView.findViewById(R.id.row_field_action_right);
+        EditTextDispatched value = (EditTextDispatched) holder.itemView
+            .findViewById(R.id.row_field_value);
+        ImageButton actionLeft = (ImageButton) holder.itemView
+            .findViewById(R.id.row_field_action_left);
+        ImageButton actionRight = (ImageButton) holder.itemView
+            .findViewById(R.id.row_field_action_right);
 
         if (holder instanceof FieldViewHolderText
             || holder instanceof FieldViewHolderNumber
@@ -376,11 +463,24 @@ public class FieldAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
             actionRight.setVisibility(mEditable ? View.VISIBLE : View.GONE);
 
         } else if (holder instanceof FieldViewHolderPassword) {
-            actionLeft.setVisibility(mEditable ? View.VISIBLE : View.GONE);
-            actionRight.setVisibility(mEditable ? View.VISIBLE : View.VISIBLE);
+            actionLeft.setVisibility(mEditable ? View.VISIBLE : View.VISIBLE);
+            actionRight.setVisibility(mEditable ? View.VISIBLE : View.GONE);
 
+            if (mEditable) {
+                actionLeft.setImageDrawable(
+                    mActivity.getResources().getDrawable(R.drawable.cube_outline));
+                showPasswordField(value);
+                ensureShowGenerator(value, actionLeft);
+            } else {
+                hidePasswordField(value);
+                actionLeft.setImageDrawable(mActivity.getResources().getDrawable(
+                    value.getInputType() == InputType.TYPE_TEXT_VARIATION_VISIBLE_PASSWORD ?
+                        R.drawable.eye_off : R.drawable.eye));
+                ensureToggleVisibility(value, actionLeft);
+            }
         } else if (holder instanceof FieldViewHolderOtp) {
-            ProgressBar progressBar = holder.itemView.findViewById(R.id.row_field_progressbar);
+            ProgressBar progressBar = (ProgressBar) holder.itemView
+                .findViewById(R.id.row_field_progressbar);
             actionLeft.setVisibility(mEditable ? View.VISIBLE : View.GONE);
             actionRight.setVisibility(mEditable ? View.VISIBLE : View.INVISIBLE);
             progressBar.setVisibility(mEditable ? View.INVISIBLE : View.VISIBLE);
@@ -395,6 +495,11 @@ public class FieldAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
         }
 
         changeEditTextBehaviour(value, mEditable);
+    }
+
+    private void hidePasswordField(EditTextDispatched value) {
+        value.setInputType(
+            InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD);
     }
 
 

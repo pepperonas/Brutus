@@ -31,6 +31,10 @@ public class EditTextDispatched extends android.support.v7.widget.AppCompatEditT
 
     private boolean editable = true;
 
+    private boolean hidden = true;
+    private String clearText = "";
+
+
     public EditTextDispatched(Context context) {
         super(context);
     }
@@ -50,6 +54,15 @@ public class EditTextDispatched extends android.support.v7.widget.AppCompatEditT
     public void setEditable(boolean editable) {
         this.editable = editable;
     }
+
+    public boolean isHidden() { return hidden; }
+
+    public void setHidden(boolean hidden) { this.hidden = hidden; }
+
+    public String getClearText() { return clearText; }
+
+    public void setClearText(String clearText) { this.clearText = clearText; }
+
 
     @Override
     public boolean dispatchTouchEvent(MotionEvent motionEvent) {
