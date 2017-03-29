@@ -16,28 +16,22 @@
 
 package io.celox.brutus;
 
-import android.app.Application;
-import com.pepperonas.aespreferences.AesPrefs;
-import com.pepperonas.andbasx.AndBasx;
-
+import java.math.BigInteger;
+import org.apache.commons.codec.binary.Base32;
 
 /**
  * @author Martin Pfeffer
  * @see <a href="https://celox.io">https://celox.io</a>
  */
-public class App extends Application {
+public class Utilities {
 
-    private static final String TAG = "App";
-
-    @Override
-    public void onCreate() {
-        super.onCreate();
-
-        AesPrefs.init(this, "aesp", "struct-brah-plemp-slem-clez-strot-smund-skib",
-            AesPrefs.LogMode.ALL);
-
-        AndBasx.init(this);
-
-
+    public static final String toHex(byte[] secret) {
+        return String.format("%x", new BigInteger(1, secret));
     }
+
+
+    public static final byte[] fromBase32(String base32) {
+        return new Base32().decode(base32);
+    }
+
 }

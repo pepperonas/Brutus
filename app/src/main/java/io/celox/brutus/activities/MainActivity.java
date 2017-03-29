@@ -41,7 +41,9 @@ import java.util.List;
 public class MainActivity extends AppCompatActivity implements
     NavigationView.OnNavigationItemSelectedListener {
 
-    private List<Wrapper> wrappers = new ArrayList<>();
+    private static final String TAG = "MainActivity";
+
+    private List<Wrapper> mWrappers = new ArrayList<>();
     private RecyclerView mRecyclerView;
     private WrapperAdapter mWrapperAdapter;
 
@@ -67,13 +69,14 @@ public class MainActivity extends AppCompatActivity implements
         navigationView.setNavigationItemSelectedListener(this);
 
         initRecyclerView();
+
     }
 
 
     private void initRecyclerView() {
         mRecyclerView = (RecyclerView) findViewById(R.id.recycler_view);
 
-        mWrapperAdapter = new WrapperAdapter(this, wrappers);
+        mWrapperAdapter = new WrapperAdapter(this, mWrappers);
         RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(this);
         mRecyclerView.setLayoutManager(layoutManager);
         mRecyclerView.setItemAnimator(new DefaultItemAnimator());
@@ -83,7 +86,7 @@ public class MainActivity extends AppCompatActivity implements
         fields.add(new Field(this, System.currentTimeMillis(), "D", "V", Type.LOGIN));
 
         for (int i = 0; i < 120; i++) {
-            wrappers.add(new Wrapper(this, System.currentTimeMillis(), "W(" + i + ")", fields));
+            mWrappers.add(new Wrapper(this, System.currentTimeMillis(), "W(" + i + ")", fields));
         }
 
         mWrapperAdapter.notifyDataSetChanged();

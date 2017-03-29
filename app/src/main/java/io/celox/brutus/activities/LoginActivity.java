@@ -20,22 +20,28 @@ import static android.Manifest.permission.READ_CONTACTS;
 
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 import io.celox.brutus.R;
+import io.celox.brutus.Utilities;
 import io.celox.brutus.crypto.CryptoX;
+import io.celox.brutus.crypto.TotpManager;
 
 /**
  * A login screen that offers to set the password.
  */
 public class LoginActivity extends AppCompatActivity {
+
+    private static final String TAG = "LoginActivity";
 
     boolean testMakeCryptoConfig = false;
 
@@ -49,12 +55,13 @@ public class LoginActivity extends AppCompatActivity {
     private EditText mEtEnterPassword;
     private EditText mEtEnterPasswordAgain;
 
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
-        // Set up the login form.
 
+        // Set up the login form.
         mEtEnterPassword = (EditText) findViewById(R.id.et_enter_password);
         mEtEnterPasswordAgain = (EditText) findViewById(R.id.et_enter_password_again);
 
@@ -66,14 +73,62 @@ public class LoginActivity extends AppCompatActivity {
 
         mViewSetPassword = findViewById(R.id.set_password_form);
 
+        processEncyption();
+
+        processOneTimePassword("");
+
+//        scan();
+    }
+
+    private void processEncyption() {
         if (testMakeCryptoConfig) {
             new CryptoX("hallo");
         } else {
             CryptoX.testDecryption("hallo");
         }
-
     }
 
+    private void processOneTimePassword(String privateKey) {
+        try {
+            byte[] decodedKey = Utilities.fromBase32(privateKey);
+            String hexKey = Utilities.toHex(decodedKey);
+            Log.d(TAG, "onCreate: hexKey=" + hexKey + " | " + hexKey.length() * 4 + " bits");
+
+            TotpManager totpManager = new TotpManager();
+            String code = totpManager.generate(decodedKey);
+            Log.d(TAG, "onCreate: code=" + code);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+
+    private void scan() {
+        try {
+            Intent intent = new Intent("com.google.zxing.client.android.SCAN");
+            intent.putExtra("SCAN_MODE", "QR_CODE_MODE");
+            startActivityForResult(intent, 0);
+        } catch (Exception e) {
+            Uri uri = Uri.parse("market://details?id=com.google.zxing.client.android");
+            Intent marketIntent = new Intent(Intent.ACTION_VIEW, uri);
+            startActivity(marketIntent);
+        }
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == 0) {
+
+            if (resultCode == RESULT_OK) {
+                String contents = data.getStringExtra("SCAN_RESULT");
+                Log.d(TAG, "onActivityResult: " + contents);
+            }
+            if (resultCode == RESULT_CANCELED) {
+                //handle cancel
+            }
+        }
+    }
 
     private void populateAutoComplete() {
         if (!mayRequestContacts()) {

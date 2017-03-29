@@ -18,13 +18,13 @@ package io.celox.brutus.activities;
 
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.PopupMenu;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -32,24 +32,19 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
+import com.pepperonas.andbasx.concurrency.LoaderTaskUtils;
+import com.pepperonas.andbasx.concurrency.LoaderTaskUtils.Action;
+import com.pepperonas.andbasx.concurrency.LoaderTaskUtils.Builder;
+import com.pepperonas.andbasx.interfaces.LoaderTaskListener;
 import io.celox.brutus.R;
 import io.celox.brutus.adapter.FieldAdapter;
 import io.celox.brutus.model.Field;
 import io.celox.brutus.model.Field.Type;
-import java.io.BufferedReader;
-import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import org.apache.http.HttpEntity;
-import org.apache.http.HttpResponse;
-import org.apache.http.client.HttpClient;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.impl.client.DefaultHttpClient;
 
 /**
  * The type Wrapper detail activity.
@@ -65,6 +60,7 @@ public class WrapperDetailActivity extends AppCompatActivity {
     private List<Field> fields = new ArrayList<>();
     private LinearLayoutManager mLayoutManager;
     private RecyclerView mRecyclerView;
+    private ImageView mIcon;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -77,16 +73,16 @@ public class WrapperDetailActivity extends AppCompatActivity {
         mTvModified = (TextView) findViewById(R.id.tv_modified);
         String modified = getString(R.string.modified) + ": " + new Date().getTime();
 
-        ImageView ivIcon = (ImageView) findViewById(R.id.iv_icon);
-        ivIcon.setOnClickListener(view -> {
-            PopupMenu mp = new PopupMenu(WrapperDetailActivity.this, ivIcon);
+        mIcon = (ImageView) findViewById(R.id.iv_icon);
+        mIcon.setOnClickListener(view -> {
+            PopupMenu mp = new PopupMenu(WrapperDetailActivity.this, mIcon);
             mp.inflate(R.menu.popup_icon_chooser);
             mp.show();
             mp.setOnMenuItemClickListener(item -> {
                 int id = item.getItemId();
                 switch (id) {
                     case R.id.popup_icon_chooser_web:
-                        fetchWebIcon(ivIcon, "https://celox.io");
+                        fetchWebIcon(mIcon, "https://celox.io");
                         break;
                 }
                 return false;
@@ -198,51 +194,73 @@ public class WrapperDetailActivity extends AppCompatActivity {
     }
 
     public void fetchWebIcon(ImageView icon, String siteUrl) {
-        AsyncTask.execute(() -> {
-            HttpClient httpclient = new DefaultHttpClient();
-            HttpGet httpget = new HttpGet(siteUrl);
-            try {
-                HttpResponse response = httpclient.execute(httpget);
-                HttpEntity entity = response.getEntity();
-                InputStream is = entity.getContent();
-                BufferedReader reader = new BufferedReader(new InputStreamReader(is, "UTF-8"), 8);
-                StringBuilder sb = new StringBuilder();
-                String line = null;
-                while ((line = reader.readLine()) != null) {
-                    sb.append(line).append("\n");
-                }
-                is.close();
-                setWebIcon(icon, siteUrl, sb.toString());
-            } catch (IOException e) {
-                e.printStackTrace();
+
+        new Builder(this, new LoaderTaskListener() {
+            @Override
+            public void onLoaderTaskSuccess(Action action, String msg) {
+                Log.i(TAG, "onLoaderTaskSuccess: " + msg);
+                downloadIconImage(siteUrl, msg);
             }
-        });
+
+            @Override
+            public void onLoaderTaskFailed(Action action, String msg) {
+
+            }
+
+            @Override
+            public void onLoaderTaskSuccess(Action action, InputStream inputStream) {
+
+            }
+
+            @Override
+            public void onLoaderTaskFailed(Action action, InputStream inputStream) {
+
+            }
+        }, "https://celox.io")
+            .showProgressDialog("loading", "...")
+            .launch();
+
     }
 
-    public void setWebIcon(ImageView icon, String siteUrl, String htmlSource) {
-        AsyncTask.execute(() -> {
-            URL url;
-            String imgUrl = null;
-            if (htmlSource.contains("<link rel=\"shortcut icon\" href=\"")) {
-                imgUrl = htmlSource
-                    .split("<link rel=\"shortcut icon\" " + "href=\"")[1]
-                    .split("\"/>")[0];
+    private void downloadIconImage(String siteUrl, String htmlSource) {
+
+        URL url;
+        String imgUrl = null;
+        if (htmlSource.contains("<link rel=\"shortcut icon\" href=\"")) {
+            imgUrl = htmlSource
+                .split("<link rel=\"shortcut icon\" " + "href=\"")[1]
+                .split("\"/>")[0];
+        }
+
+        if (imgUrl == null) {
+            imgUrl = "http://s2.googleusercontent.com/s2/favicons?domain_url=" + siteUrl;
+        }
+
+        new LoaderTaskUtils.Builder(this, new LoaderTaskListener() {
+            @Override
+            public void onLoaderTaskSuccess(Action action, String msg) {
+
             }
-            try {
-                if (imgUrl == null) {
-                    url = new URL(
-                        "http://s2.googleusercontent" + ".com/s2/favicons?domain_url=" + siteUrl);
-                } else {
-                    url = new URL(imgUrl);
-                }
-                Bitmap bmp = BitmapFactory.decodeStream(url.openConnection().getInputStream());
-                runOnUiThread(() -> icon.setImageBitmap(bmp));
-            } catch (MalformedURLException e) {
-                e.printStackTrace();
-            } catch (IOException e2) {
-                e2.printStackTrace();
+
+            @Override
+            public void onLoaderTaskFailed(Action action, String s) {
+
             }
-        });
+
+            @Override
+            public void onLoaderTaskSuccess(Action action, InputStream inputStream) {
+                Bitmap bmp = BitmapFactory.decodeStream(inputStream);
+                runOnUiThread(() -> mIcon.setImageBitmap(bmp));
+
+            }
+
+            @Override
+            public void onLoaderTaskFailed(Action action, InputStream inputStream) {
+
+            }
+
+        }, imgUrl).launch();
+
     }
 
 }

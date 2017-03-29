@@ -38,12 +38,12 @@
     android:id="@+id/row_field_action_right"
     style="@style/row_field_action"
     android:layout_alignParentRight="true"
-    app:srcCompat="@drawable/common_google_signin_btn_icon_dark_disabled"/>
+    app:srcCompat="@drawable/ic_menu_camera"/>
 
   <ImageButton
     android:id="@+id/row_field_action_left"
     style="@style/row_field_action"
     android:layout_toLeftOf="@+id/row_field_action_right"
-    app:srcCompat="@drawable/common_google_signin_btn_icon_dark_disabled"/>
+    app:srcCompat="@drawable/ic_menu_camera"/>
 
 </RelativeLayout>

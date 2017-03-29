@@ -19,7 +19,13 @@ apply plugin: 'com.android.application'
 repositories {
     jcenter()
     maven { url "https://jitpack.io" }
+
 }
+
+//repositories {
+//    jcenter()
+//    flatDir { dirs 'libs' }
+//}
 
 android {
     compileSdkVersion 'android-O'
@@ -35,7 +41,9 @@ android {
         versionCode 1
         versionName "1.0"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+        multiDexEnabled true
         jackOptions {
+            additionalParameters("jack.incremental": "true")
             enabled true
         }
     }
@@ -52,19 +60,24 @@ android {
 }
 
 dependencies {
-    compile fileTree(dir: 'libs', include: ['*.jar'])
+    compile fileTree(include: ['*.jar'], dir: 'libs')
+    compile 'com.android.support:multidex:1.0.1'
     androidTestCompile('com.android.support.test.espresso:espresso-core:2.2.2', {
         exclude group: 'com.android.support', module: 'support-annotations'
     })
-
+    //    compile(name: 'andbasx-0.0.1', ext: 'aar')
+    compile 'com.github.pepperonas:andbasx:0.2.9'
     compile 'com.github.pepperonas:aespreferences:0.0.6'
     compile 'com.github.pepperonas:materialdialog:0.3.0'
-    compile 'com.github.pepperonas:andbasx:0.2.6'
-
-//    compile 'com.android.support:appcompat-v7:26.0.0-alpha1'
-    compile 'com.android.support:appcompat-v7:25.3.0'
-    compile 'com.android.support:recyclerview-v7:25.3.0'
-    compile 'com.android.support:design:25.3.0'
+    //    compile 'com.android.support:appcompat-v7:26.0.0-alpha1'
+    compile 'com.android.support:appcompat-v7:25.3.1'
+    compile 'com.android.support:recyclerview-v7:25.3.1'
+    compile 'com.android.support:design:25.3.1'
     compile 'com.android.support.constraint:constraint-layout:1.0.2'
     testCompile 'junit:junit:4.12'
+    compile files('libs/guava-14.0.1.jar')
+    compile files('libs/commons-codec-1.10-sources.jar')
+    compile files('libs/org-apache-commons-codec.jar')
+    compile files('libs/commons-codec-1.9-javadoc.jar')
+    compile files('libs/commons-codec-1.9.jar')
 }
