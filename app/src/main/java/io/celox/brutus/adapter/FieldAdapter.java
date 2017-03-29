@@ -17,6 +17,7 @@
 package io.celox.brutus.adapter;
 
 import android.app.Activity;
+import android.os.Handler;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.RecyclerView.ViewHolder;
 import android.text.InputType;
@@ -26,13 +27,18 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageButton;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import io.celox.brutus.R;
 import io.celox.brutus.custom.EditTextDispatched;
 import io.celox.brutus.model.Field;
 import io.celox.brutus.model.Field.Type;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
+import java.util.Timer;
+import java.util.TimerTask;
 
 /**
  * @author Martin Pfeffer
@@ -42,28 +48,64 @@ public class FieldAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
 
     private static final String TAG = "FieldAdapter";
 
-    private boolean editable = false;
-    private Activity activity;
-    private List<Field> fields = new ArrayList<>();
+    // animating OPT validity
+    private List<ProgressBar> mProgressBarList = new ArrayList<>();
+    private int mProgressCounter = 0;
+    private boolean mCountForward = true;
+    private Handler mHandler = new Handler();
+    private Calendar mCalendar = Calendar.getInstance();
+    private boolean mAnimating = false;
+    private Timer mTimer = new Timer();
+    private TimerTask mAnimationTask = new TimerTask() {
+        public void run() {
+            mHandler.post(() -> {
+                mAnimating = true;
 
-    public boolean isEditable() {
-        return editable;
-    }
+                mCalendar.setTime(new Date(System.currentTimeMillis()));
+                int seconds = mCalendar.get(Calendar.SECOND);
 
-    public void setEditable(boolean editable) {
-        Log.d(TAG, "setEditable: " + editable);
-        this.editable = editable;
-    }
+                mCountForward = seconds < 30;
 
-    public FieldAdapter(Activity activity, List<Field> fields) {
-        this.fields = fields;
-        this.activity = activity;
-    }
+                if (mProgressCounter >= 300) {
+                    mCountForward = false;
+                }
+                if (mProgressCounter <= 0) {
+                    mCountForward = true;
+                }
+                if (mCountForward) {
+                    mProgressCounter += 10;
+                } else {
+                    mProgressCounter -= 10;
+                }
 
+                Log.d(TAG, "progressCounter=" + mProgressCounter);
+                for (ProgressBar pb : mProgressBarList) {
+                    if (pb != null) {
+                        pb.setProgress(mProgressCounter);
+                    }
+                }
+            });
+        }
+    };
+
+
+    private boolean mEditable = false;
+    private Activity mActivity;
+    private List<Field> mFields = new ArrayList<>();
+
+
+    public boolean isEditable() { return mEditable; }
+
+    public void setEditable(boolean editable) { this.mEditable = editable; }
 
     private void changeEditTextBehaviour(EditTextDispatched value, boolean editable) {
         value.setEditable(editable);
         value.setEnabled(editable);
+    }
+
+    public FieldAdapter(Activity activity, List<Field> fields) {
+        this.mFields = fields;
+        this.mActivity = activity;
     }
 
     public class FieldViewHolderBase extends RecyclerView.ViewHolder {
@@ -80,44 +122,28 @@ public class FieldAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
             actionLeft = view.findViewById(R.id.row_field_action_left);
             actionRight = view.findViewById(R.id.row_field_action_right);
             actionLeft.setVisibility(View.GONE);
-            actionRight.setVisibility(editable ? View.VISIBLE : View.INVISIBLE);
-            actionRight.setImageDrawable(activity.getResources().getDrawable(R.drawable.close));
+            actionRight.setVisibility(mEditable ? View.VISIBLE : View.INVISIBLE);
+            actionRight.setImageDrawable(mActivity.getResources().getDrawable(R.drawable.close));
 
-            changeEditTextBehaviour(value, editable);
+            changeEditTextBehaviour(value, mEditable);
             value.requestFocus();
         }
 
-        public TextView getDescription() {
-            return description;
-        }
+        TextView getDescription() { return description; }
 
-        public void setDescription(TextView description) {
-            this.description = description;
-        }
+        public void setDescription(TextView description) { this.description = description; }
 
-        public EditTextDispatched getValue() {
-            return value;
-        }
+        EditTextDispatched getValue() { return value; }
 
-        public void setValue(EditTextDispatched value) {
-            this.value = value;
-        }
+        void setValue(EditTextDispatched value) { this.value = value; }
 
-        public ImageView getActionLeft() {
-            return actionLeft;
-        }
+        ImageView getActionLeft() { return actionLeft; }
 
-        public void setActionLeft(ImageView actionLeft) {
-            this.actionLeft = actionLeft;
-        }
+        void setActionLeft(ImageView actionLeft) { this.actionLeft = actionLeft; }
 
-        public ImageView getActionRight() {
-            return actionRight;
-        }
+        ImageView getActionRight() { return actionRight; }
 
-        public void setActionRight(ImageView actionRight) {
-            this.actionRight = actionRight;
-        }
+        public void setActionRight(ImageView actionRight) { this.actionRight = actionRight; }
     }
 
     public class FieldViewHolderText extends FieldViewHolderBase {
@@ -157,6 +183,11 @@ public class FieldAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
         FieldViewHolderOtp(View view) {
             super(view);
             getActionLeft().setVisibility(View.VISIBLE);
+            getActionRight().setVisibility(View.VISIBLE);
+
+            if (!mAnimating) {
+                mTimer.schedule(mAnimationTask, 0, 1001);
+            }
         }
     }
 
@@ -164,7 +195,8 @@ public class FieldAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
 
         FieldViewHolderUrl(View view) {
             super(view);
-            getActionLeft().setImageDrawable(activity.getResources().getDrawable(R.drawable.earth));
+            getActionLeft()
+                .setImageDrawable(mActivity.getResources().getDrawable(R.drawable.earth));
             getActionRight().setVisibility(View.VISIBLE);
         }
     }
@@ -260,57 +292,57 @@ public class FieldAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
         switch (Type.values()[holder.getItemViewType()]) {
             case TEXT:
                 FieldViewHolderText viewHolderText = (FieldViewHolderText) holder;
-                field = fields.get(position);
+                field = mFields.get(position);
                 viewHolderText.getDescription().setText(field.getDescription());
                 break;
             case NUMBER:
                 FieldViewHolderNumber viewHolderNumber = (FieldViewHolderNumber) holder;
-                field = fields.get(position);
+                field = mFields.get(position);
                 viewHolderNumber.getDescription().setText(field.getDescription());
                 break;
             case LOGIN:
                 FieldViewHolderLogin viewHolderLogin = (FieldViewHolderLogin) holder;
-                field = fields.get(position);
+                field = mFields.get(position);
                 viewHolderLogin.getDescription().setText(field.getDescription());
                 break;
             case PASSWORD:
                 FieldViewHolderPassword viewHolderPassword = (FieldViewHolderPassword) holder;
-                field = fields.get(position);
+                field = mFields.get(position);
                 viewHolderPassword.getDescription().setText(field.getDescription());
                 break;
             case OTP:
                 FieldViewHolderOtp viewHolderOtp = (FieldViewHolderOtp) holder;
-                field = fields.get(position);
+                field = mFields.get(position);
                 viewHolderOtp.getDescription().setText(field.getDescription());
                 break;
             case URL:
                 FieldViewHolderUrl viewHolderUrl = (FieldViewHolderUrl) holder;
-                field = fields.get(position);
+                field = mFields.get(position);
                 viewHolderUrl.getDescription().setText(field.getDescription());
                 break;
             case MAIL:
                 FieldViewHolderMail viewHolderMail = (FieldViewHolderMail) holder;
-                field = fields.get(position);
+                field = mFields.get(position);
                 viewHolderMail.getDescription().setText(field.getDescription());
                 break;
             case PHONE:
                 FieldViewHolderPhone viewHolderPhone = (FieldViewHolderPhone) holder;
-                field = fields.get(position);
+                field = mFields.get(position);
                 viewHolderPhone.getDescription().setText(field.getDescription());
                 break;
             case DATE:
                 FieldViewHolderDate viewHolderDate = (FieldViewHolderDate) holder;
-                field = fields.get(position);
+                field = mFields.get(position);
                 viewHolderDate.getDescription().setText(field.getDescription());
                 break;
             case PIN:
                 FieldViewHolderPin viewHolderPin = (FieldViewHolderPin) holder;
-                field = fields.get(position);
+                field = mFields.get(position);
                 viewHolderPin.getDescription().setText(field.getDescription());
                 break;
             case SECRET:
                 FieldViewHolderSecret viewHolderSecret = (FieldViewHolderSecret) holder;
-                field = fields.get(position);
+                field = mFields.get(position);
                 viewHolderSecret.getDescription().setText(field.getDescription());
                 break;
         }
@@ -318,7 +350,7 @@ public class FieldAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
 
     @Override
     public int getItemViewType(int position) {
-        return fields.get(position).getType().ordinal();
+        return mFields.get(position).getType().ordinal();
     }
 
     @Override
@@ -332,39 +364,43 @@ public class FieldAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
             || holder instanceof FieldViewHolderNumber
             || holder instanceof FieldViewHolderDate) {
             actionLeft.setVisibility(View.GONE);
-            actionRight.setVisibility(editable ? View.VISIBLE : View.GONE);
+            actionRight.setVisibility(mEditable ? View.VISIBLE : View.GONE);
 
         } else if (holder instanceof FieldViewHolderPin
             || holder instanceof FieldViewHolderSecret) {
-            actionLeft.setVisibility(editable ? View.GONE : View.GONE);
-            actionRight.setVisibility(editable ? View.VISIBLE : View.VISIBLE);
+            actionLeft.setVisibility(mEditable ? View.GONE : View.GONE);
+            actionRight.setVisibility(mEditable ? View.VISIBLE : View.VISIBLE);
 
         } else if (holder instanceof FieldViewHolderLogin) {
-            actionLeft.setVisibility(editable ? View.VISIBLE : View.GONE);
-            actionRight.setVisibility(editable ? View.VISIBLE : View.GONE);
+            actionLeft.setVisibility(mEditable ? View.VISIBLE : View.GONE);
+            actionRight.setVisibility(mEditable ? View.VISIBLE : View.GONE);
 
         } else if (holder instanceof FieldViewHolderPassword) {
-            actionLeft.setVisibility(editable ? View.VISIBLE : View.GONE);
-            actionRight.setVisibility(editable ? View.VISIBLE : View.VISIBLE);
+            actionLeft.setVisibility(mEditable ? View.VISIBLE : View.GONE);
+            actionRight.setVisibility(mEditable ? View.VISIBLE : View.VISIBLE);
 
         } else if (holder instanceof FieldViewHolderOtp) {
-            actionLeft.setVisibility(editable ? View.VISIBLE : View.GONE);
-            actionRight.setVisibility(editable ? View.VISIBLE : View.VISIBLE);
+            ProgressBar progressBar = holder.itemView.findViewById(R.id.row_field_progressbar);
+            actionLeft.setVisibility(mEditable ? View.VISIBLE : View.GONE);
+            actionRight.setVisibility(mEditable ? View.VISIBLE : View.INVISIBLE);
+            progressBar.setVisibility(mEditable ? View.INVISIBLE : View.VISIBLE);
+
+            mProgressBarList.add(progressBar);
 
         } else if (holder instanceof FieldViewHolderUrl
             || holder instanceof FieldViewHolderMail
             || holder instanceof FieldViewHolderPhone) {
-            actionLeft.setVisibility(editable ? View.GONE : View.GONE);
-            actionRight.setVisibility(editable ? View.VISIBLE : View.VISIBLE);
+            actionLeft.setVisibility(mEditable ? View.GONE : View.GONE);
+            actionRight.setVisibility(mEditable ? View.VISIBLE : View.VISIBLE);
         }
 
-        changeEditTextBehaviour(value, editable);
+        changeEditTextBehaviour(value, mEditable);
     }
 
 
     @Override
     public int getItemCount() {
-        return fields.size();
+        return mFields.size();
     }
 
 

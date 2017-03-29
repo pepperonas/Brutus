@@ -27,4 +27,6 @@
   <!-- field -->
   <color name="row_field_description">@color/grey_800</color>
   <color name="row_field">@color/grey_800</color>
+  <color name="progressbar_color_end">#007DD6</color>
+  <color name="progressbar_color_start">#007DD6</color>
 </resources>

@@ -1,5 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!--
+<?xml version="1.0" encoding="utf-8"?><!--
   ~ Copyright (c) 2017 Martin Pfeffer
   ~
   ~ Licensed under the Apache License, Version 2.0 (the "License");
@@ -30,20 +29,42 @@
     android:id="@+id/row_field_value"
     style="@style/row_field_text_display"
     android:layout_alignParentBottom="true"
-    android:text="@string/empty"
     android:layout_toLeftOf="@+id/row_field_action_left"
-    android:layout_toStartOf="@+id/row_field_action_left"/>
-
-  <ImageButton
-    android:id="@+id/row_field_action_right"
-    style="@style/row_field_action"
-    android:layout_alignParentRight="true"
-    app:srcCompat="@drawable/ic_menu_camera"/>
+    android:layout_toStartOf="@+id/row_field_action_left"
+    android:text="@string/empty"/>
 
   <ImageButton
     android:id="@+id/row_field_action_left"
     style="@style/row_field_action"
     android:layout_toLeftOf="@+id/row_field_action_right"
+    android:layout_toStartOf="@+id/row_field_action_right"
+    android:contentDescription="@string/content_description_row_action_field_left"
     app:srcCompat="@drawable/ic_menu_camera"/>
+
+  <ImageButton
+    android:id="@+id/row_field_action_right"
+    style="@style/row_field_action"
+    android:layout_alignParentEnd="true"
+    android:layout_alignParentRight="true"
+    android:contentDescription="@string/content_description_row_action_field_right"
+    app:srcCompat="@drawable/ic_menu_camera"/>
+
+  <ProgressBar
+    android:id="@+id/row_field_progressbar"
+    style="?android:attr/progressBarStyleHorizontal"
+    android:layout_width="24dp"
+    android:layout_height="24dp"
+    android:layout_marginStart="16dp"
+    android:layout_marginLeft="16dp"
+    android:layout_alignParentEnd="true"
+    android:layout_alignParentRight="true"
+    android:layout_centerVertical="true"
+    android:background="@drawable/circle_shape"
+    android:indeterminate="false"
+    android:max="300"
+    android:progress="0"
+    android:progressDrawable="@drawable/circular_progressbar"
+    android:secondaryProgress="0"
+    android:visibility="invisible"/>
 
 </RelativeLayout>

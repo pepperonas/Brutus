@@ -19,6 +19,7 @@ package io.celox.brutus.activities;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
@@ -41,10 +42,11 @@ import io.celox.brutus.adapter.FieldAdapter;
 import io.celox.brutus.model.Field;
 import io.celox.brutus.model.Field.Type;
 import java.io.InputStream;
-import java.net.URL;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 
 /**
  * The type Wrapper detail activity.
@@ -71,7 +73,9 @@ public class WrapperDetailActivity extends AppCompatActivity {
         tvTitle.setText(getString(R.string.sample_title));
 
         mTvModified = (TextView) findViewById(R.id.tv_modified);
-        String modified = getString(R.string.modified) + ": " + new Date().getTime();
+
+        String modified = makeInfoModified();
+        mTvModified.setText(modified);
 
         mIcon = (ImageView) findViewById(R.id.iv_icon);
         mIcon.setOnClickListener(view -> {
@@ -93,7 +97,7 @@ public class WrapperDetailActivity extends AppCompatActivity {
         mBtnAddField.setVisibility(View.GONE);
         mBtnAddField.setOnClickListener(view -> {
             PopupMenu mp = new PopupMenu(WrapperDetailActivity.this,
-                findViewById(R.id.btn_add_field));
+                mBtnAddField);
             mp.inflate(R.menu.popup_field_chooser);
             mp.show();
             mp.setOnMenuItemClickListener(item -> {
@@ -160,6 +164,19 @@ public class WrapperDetailActivity extends AppCompatActivity {
         mFieldAdapter.notifyDataSetChanged();
     }
 
+    @NonNull
+    private String makeInfoModified() {
+        Locale locale = this.getResources().getConfiguration().locale;
+        SimpleDateFormat sdf;
+        if (locale == Locale.GERMAN) {
+            sdf = new SimpleDateFormat("EEEE dd/MM.yyyy HH:mm", locale);
+        } else {
+            sdf = new SimpleDateFormat("EEEE MM/dd/yyyy HH:mm", locale);
+        }
+        return String.format("%s %s", getString(R.string.modified),
+            sdf.format(new Date(System.currentTimeMillis())));
+    }
+
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater = getMenuInflater();
@@ -203,28 +220,20 @@ public class WrapperDetailActivity extends AppCompatActivity {
             }
 
             @Override
-            public void onLoaderTaskFailed(Action action, String msg) {
-
-            }
+            public void onLoaderTaskFailed(Action action, String msg) { }
 
             @Override
-            public void onLoaderTaskSuccess(Action action, InputStream inputStream) {
-
-            }
+            public void onLoaderTaskSuccess(Action action, InputStream inputStream) { }
 
             @Override
-            public void onLoaderTaskFailed(Action action, InputStream inputStream) {
-
-            }
+            public void onLoaderTaskFailed(Action action, InputStream inputStream) { }
         }, "https://celox.io")
-            .showProgressDialog("loading", "...")
+            .showProgressDialog(getString(R.string.dialog_title_loading),
+                getString(R.string.dialog_msg_loading))
             .launch();
-
     }
 
     private void downloadIconImage(String siteUrl, String htmlSource) {
-
-        URL url;
         String imgUrl = null;
         if (htmlSource.contains("<link rel=\"shortcut icon\" href=\"")) {
             imgUrl = htmlSource
@@ -238,26 +247,19 @@ public class WrapperDetailActivity extends AppCompatActivity {
 
         new LoaderTaskUtils.Builder(this, new LoaderTaskListener() {
             @Override
-            public void onLoaderTaskSuccess(Action action, String msg) {
-
-            }
+            public void onLoaderTaskSuccess(Action action, String msg) { }
 
             @Override
-            public void onLoaderTaskFailed(Action action, String s) {
-
-            }
+            public void onLoaderTaskFailed(Action action, String s) { }
 
             @Override
             public void onLoaderTaskSuccess(Action action, InputStream inputStream) {
                 Bitmap bmp = BitmapFactory.decodeStream(inputStream);
                 runOnUiThread(() -> mIcon.setImageBitmap(bmp));
-
             }
 
             @Override
-            public void onLoaderTaskFailed(Action action, InputStream inputStream) {
-
-            }
+            public void onLoaderTaskFailed(Action action, InputStream inputStream) { }
 
         }, imgUrl).launch();
 

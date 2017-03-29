@@ -62,5 +62,9 @@
   <string name="field_pin">PIN</string>
   <string name="field_secret">Secret</string>
   <string name="action_edit">Edit</string>
-  <string name="empty" />
+  <string name="empty"/>
+  <string name="content_description_row_action_field_left">Invoke field action</string>
+  <string name="content_description_row_action_field_right">Invoke field action</string>
+  <string name="dialog_title_loading">Loading</string>
+  <string name="dialog_msg_loading">This should only take a few seconds.</string>
 </resources>
