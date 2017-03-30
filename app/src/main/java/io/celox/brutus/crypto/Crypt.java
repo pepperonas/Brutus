@@ -45,6 +45,8 @@ import javax.crypto.spec.SecretKeySpec;
  * PHONE = Google Pixel (late 2016)
  *
  * LAPTOP = Macbook Pro (mid 2015)
+ *
+ * TEXT-LENGTH = short ( ~6 chars)
  */
 public class Crypt {
 
