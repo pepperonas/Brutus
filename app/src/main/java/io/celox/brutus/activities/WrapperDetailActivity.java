@@ -193,6 +193,7 @@ public class WrapperDetailActivity extends AppCompatActivity {
                 for (int i = 0; i < mFieldAdapter.getItemCount(); i++) {
                 // update each item itself
                     mFieldAdapter.notifyItemChanged(i, fields.get(i));
+                    mFieldAdapter.changeEditTextBehaviour(mLayoutManager.getChildAt(i));
                 }
                 mBtnAddField.setVisibility(mFieldAdapter.isEditable() ? View.VISIBLE : View.GONE);
                 mTvModified.setVisibility(!mFieldAdapter.isEditable() ? View.VISIBLE : View.GONE);
