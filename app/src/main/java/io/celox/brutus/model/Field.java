@@ -46,7 +46,6 @@ public class Field extends AbsBase {
     private String description;
     private String value;
     private Type type;
-//    private int position;
 
     public Field(@NonNull Context context, long created) {
         super(context, created);
@@ -83,9 +82,5 @@ public class Field extends AbsBase {
     public void setType(Type type) {
         this.type = type;
     }
-
-//    public int getPosition() { return position; }
-//
-//    void setPosition(int position) { this.position = position; }
 
 }

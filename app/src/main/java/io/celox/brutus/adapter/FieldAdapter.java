@@ -115,7 +115,6 @@ public class FieldAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
 
     public void changeEditTextBehaviour(View base) {
         EditTextDispatched etd = (EditTextDispatched) base.findViewById(R.id.row_field_value);
-
         etd.setEditable(mEditable);
         etd.setEnabled(mEditable);
     }
@@ -292,41 +291,6 @@ public class FieldAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
 
     }
 
-    private void ensureShowGenerator(EditTextDispatched etd, ImageView leftBtn) {
-        if (!mEditable) {
-//            ensureToggleVisibility(etd, leftBtn);
-            return;
-        }
-        leftBtn.setOnClickListener(new OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                ToastUtils.toastShort("TODO: implement gen!");
-            }
-        });
-    }
-
-    private void ensureToggleVisibility(EditTextDispatched etd, ImageView leftBtn) {
-        if (mEditable) {
-//            ensureShowGenerator(etd, leftBtn);
-            return;
-        }
-        leftBtn.setOnClickListener(v -> {
-            if (etd.getInputType() ==
-                InputType.TYPE_TEXT_VARIATION_VISIBLE_PASSWORD) {
-                hidePasswordField(etd);
-            } else {
-                showPasswordField(etd);
-            }
-            etd.setSelection(etd.length());
-            ((ImageButton) v).setImageDrawable(mActivity.getResources().getDrawable(
-                etd.getInputType() == InputType.TYPE_TEXT_VARIATION_VISIBLE_PASSWORD
-                    ? R.drawable.eye_off : R.drawable.eye));
-        });
-    }
-
-    private void showPasswordField(EditTextDispatched etd) {
-        etd.setInputType(InputType.TYPE_TEXT_VARIATION_VISIBLE_PASSWORD);
-    }
 
     /**
      * The type Field view holder otp.
@@ -359,8 +323,6 @@ public class FieldAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
          */
         FieldViewHolderUrl(View view) {
             super(view);
-            getActionLeft().setImageDrawable(mActivity.getResources()
-                .getDrawable(R.drawable.earth));
         }
     }
 
@@ -529,6 +491,9 @@ public class FieldAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
                 viewHolderLogin.getActionRight()
                     .setVisibility(mEditable ? View.VISIBLE : View.GONE);
 
+                viewHolderLogin.getActionLeft().setImageDrawable(mActivity.getResources()
+                    .getDrawable(R.drawable.account));
+
                 break;
             }
 
@@ -569,6 +534,10 @@ public class FieldAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
                 viewHolderOtp.getActionLeft().setVisibility(mEditable ? View.VISIBLE : View.GONE);
                 viewHolderOtp.getActionRight()
                     .setVisibility(mEditable ? View.VISIBLE : View.INVISIBLE);
+
+                viewHolderOtp.getActionLeft().setImageDrawable(mActivity.getResources()
+                    .getDrawable(R.drawable.qrcode_scan));
+
                 progressBar.setVisibility(mEditable ? View.INVISIBLE : View.VISIBLE);
 
                 mProgressBarList.add(progressBar);
@@ -583,6 +552,14 @@ public class FieldAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
                 viewHolderUrl.getActionLeft().setVisibility(mEditable ? View.GONE : View.GONE);
                 viewHolderUrl.getActionRight()
                     .setVisibility(mEditable ? View.VISIBLE : View.VISIBLE);
+
+                if (mEditable) {
+                    viewHolderUrl.getActionRight().setImageDrawable(mActivity.getResources()
+                        .getDrawable(R.drawable.close));
+                } else {
+                    viewHolderUrl.getActionRight().setImageDrawable(mActivity.getResources()
+                        .getDrawable(R.drawable.earth));
+                }
                 break;
             }
 
@@ -594,6 +571,14 @@ public class FieldAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
                 viewHolderMail.getActionLeft().setVisibility(mEditable ? View.GONE : View.GONE);
                 viewHolderMail.getActionRight()
                     .setVisibility(mEditable ? View.VISIBLE : View.VISIBLE);
+
+                if (mEditable) {
+                    viewHolderMail.getActionRight().setImageDrawable(mActivity.getResources()
+                        .getDrawable(R.drawable.close));
+                } else {
+                    viewHolderMail.getActionRight().setImageDrawable(mActivity.getResources()
+                        .getDrawable(R.drawable.message_text_outline));
+                }
                 break;
             }
 
@@ -605,6 +590,14 @@ public class FieldAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
                 viewHolderPhone.getActionLeft().setVisibility(mEditable ? View.GONE : View.GONE);
                 viewHolderPhone.getActionRight()
                     .setVisibility(mEditable ? View.VISIBLE : View.VISIBLE);
+
+                if (mEditable) {
+                    viewHolderPhone.getActionRight().setImageDrawable(mActivity.getResources()
+                        .getDrawable(R.drawable.close));
+                } else {
+                    viewHolderPhone.getActionRight().setImageDrawable(mActivity.getResources()
+                        .getDrawable(R.drawable.phone));
+                }
                 break;
             }
 
@@ -623,9 +616,25 @@ public class FieldAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
                 field = mFields.get(position);
                 viewHolderPin.getDescription().setText(field.getDescription());
 
-                viewHolderPin.getActionLeft().setVisibility(mEditable ? View.GONE : View.GONE);
-                viewHolderPin.getActionRight()
+                viewHolderPin.getActionLeft()
                     .setVisibility(mEditable ? View.VISIBLE : View.VISIBLE);
+                viewHolderPin.getActionRight()
+                    .setVisibility(mEditable ? View.GONE : View.GONE);
+
+                if (mEditable) {
+                    viewHolderPin.getActionLeft().setImageDrawable(
+                        mActivity.getResources().getDrawable(R.drawable.close));
+                    showPasswordField(viewHolderPin.getValue());
+                } else {
+                    hidePasswordFieldPin(viewHolderPin.getValue());
+                    viewHolderPin.getActionLeft().setImageDrawable(mActivity.getResources()
+                        .getDrawable(viewHolderPin.getValue().getInputType()
+                            == InputType.TYPE_TEXT_VARIATION_VISIBLE_PASSWORD ?
+                            R.drawable.eye_off : R.drawable.eye));
+                    ensureToggleVisibilityPin(viewHolderPin.getValue(),
+                        viewHolderPin.getActionLeft());
+                }
+
                 break;
             }
 
@@ -634,25 +643,99 @@ public class FieldAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
                 field = mFields.get(position);
                 viewHolderSecret.getDescription().setText(field.getDescription());
 
-                viewHolderSecret.getActionLeft().setVisibility(mEditable ? View.GONE : View.GONE);
-                viewHolderSecret.getActionRight()
+                viewHolderSecret.getActionLeft()
                     .setVisibility(mEditable ? View.VISIBLE : View.VISIBLE);
-                break;
+                viewHolderSecret.getActionRight()
+                    .setVisibility(mEditable ? View.GONE : View.GONE);
+
+                if (mEditable) {
+                    viewHolderSecret.getActionLeft().setImageDrawable(
+                        mActivity.getResources().getDrawable(R.drawable.close));
+                    showPasswordField(viewHolderSecret.getValue());
+                } else {
+                    hidePasswordField(viewHolderSecret.getValue());
+                    viewHolderSecret.getActionLeft().setImageDrawable(mActivity.getResources()
+                        .getDrawable(viewHolderSecret.getValue().getInputType()
+                            == InputType.TYPE_TEXT_VARIATION_VISIBLE_PASSWORD ?
+                            R.drawable.eye_off : R.drawable.eye));
+                    ensureToggleVisibility(viewHolderSecret.getValue(),
+                        viewHolderSecret.getActionLeft());
+                }
             }
+            break;
         }
     }
 
-    @Override
-    public int getItemViewType(int position) {
-        return mFields.get(position).getType().ordinal();
+    private void ensureToggleVisibility(EditTextDispatched etd, ImageView leftBtn) {
+        if (mEditable) {
+            return;
+        }
+        leftBtn.setOnClickListener(v -> {
+            if (etd.getInputType() ==
+                InputType.TYPE_TEXT_VARIATION_VISIBLE_PASSWORD) {
+                hidePasswordField(etd);
+            } else {
+                showPasswordField(etd);
+            }
+            etd.setSelection(etd.length());
+            ((ImageButton) v).setImageDrawable(mActivity.getResources().getDrawable(
+                etd.getInputType() == InputType.TYPE_TEXT_VARIATION_VISIBLE_PASSWORD
+                    ? R.drawable.eye_off : R.drawable.eye));
+        });
     }
 
+    private void ensureToggleVisibilityPin(EditTextDispatched etd, ImageView leftBtn) {
+        if (mEditable) {
+            return;
+        }
+        leftBtn.setOnClickListener(v -> {
+            if (etd.getInputType() ==
+                InputType.TYPE_NUMBER_VARIATION_PASSWORD) {
+                hidePasswordFieldPin(etd);
+            } else {
+                showPasswordFieldPin(etd);
+            }
+            etd.setSelection(etd.length());
+            ((ImageButton) v).setImageDrawable(mActivity.getResources().getDrawable(
+                etd.getInputType() == InputType.TYPE_NUMBER_VARIATION_PASSWORD
+                    ? R.drawable.eye_off : R.drawable.eye));
+        });
+    }
+
+    private void ensureShowGenerator(EditTextDispatched etd, ImageView leftBtn) {
+        if (!mEditable) {
+            return;
+        }
+        leftBtn.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                ToastUtils.toastShort("TODO: implement gen!");
+            }
+        });
+    }
 
     private void hidePasswordField(EditTextDispatched value) {
         value.setInputType(
             InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD);
     }
 
+    private void hidePasswordFieldPin(EditTextDispatched value) {
+        value.setInputType(
+            InputType.TYPE_CLASS_NUMBER | InputType.TYPE_NUMBER_VARIATION_PASSWORD);
+    }
+
+    private void showPasswordField(EditTextDispatched etd) {
+        etd.setInputType(InputType.TYPE_TEXT_VARIATION_VISIBLE_PASSWORD);
+    }
+
+    private void showPasswordFieldPin(EditTextDispatched etd) {
+        etd.setInputType(InputType.TYPE_NUMBER_VARIATION_PASSWORD);
+    }
+
+    @Override
+    public int getItemViewType(int position) {
+        return mFields.get(position).getType().ordinal();
+    }
 
     @Override
     public int getItemCount() {
