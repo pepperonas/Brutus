@@ -272,7 +272,6 @@ public class FieldAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
      */
     public class FieldViewHolderPassword extends FieldViewHolderBase {
 
-
         /**
          * Instantiates a new Field view holder password.
          *
@@ -640,7 +639,6 @@ public class FieldAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
                     .setVisibility(mEditable ? View.VISIBLE : View.VISIBLE);
                 break;
             }
-
         }
     }
 
