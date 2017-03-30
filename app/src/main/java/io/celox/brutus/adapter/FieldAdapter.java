@@ -17,14 +17,12 @@
 package io.celox.brutus.adapter;
 
 import android.app.Activity;
-import android.graphics.Rect;
 import android.os.Handler;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.RecyclerView.ViewHolder;
 import android.text.InputType;
 import android.util.Log;
 import android.view.LayoutInflater;
-import android.view.TouchDelegate;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
@@ -33,7 +31,6 @@ import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import com.pepperonas.andbasx.base.ToastUtils;
-import com.pepperonas.andbasx.system.DeviceUtils;
 import io.celox.brutus.R;
 import io.celox.brutus.custom.EditTextDispatched;
 import io.celox.brutus.model.Field;
@@ -46,6 +43,8 @@ import java.util.Timer;
 import java.util.TimerTask;
 
 /**
+ * The type Field adapter.
+ *
  * @author Martin Pfeffer
  * @see <a href="https://celox.io">https://celox.io</a>
  */
@@ -99,8 +98,18 @@ public class FieldAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
     private List<Field> mFields = new ArrayList<>();
 
 
+    /**
+     * Is editable boolean.
+     *
+     * @return the boolean
+     */
     public boolean isEditable() { return mEditable; }
 
+    /**
+     * Sets editable.
+     *
+     * @param editable the editable
+     */
     public void setEditable(boolean editable) { this.mEditable = editable; }
 
     private void changeEditTextBehaviour(EditTextDispatched value, boolean editable) {
@@ -108,19 +117,36 @@ public class FieldAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
         value.setEnabled(editable);
     }
 
+    /**
+     * Instantiates a new Field adapter.
+     *
+     * @param activity the activity
+     * @param fields the fields
+     */
     public FieldAdapter(Activity activity, List<Field> fields) {
         this.mFields = fields;
         this.mActivity = activity;
     }
 
+    /**
+     * The type Field view holder base.
+     */
     public class FieldViewHolderBase extends RecyclerView.ViewHolder {
 
+        /**
+         * The constant DELEGATE_SIZE.
+         */
         public static final int DELEGATE_SIZE = 16;
         private TextView description;
         private EditTextDispatched value;
         private ImageView actionLeft;
         private ImageView actionRight;
 
+        /**
+         * Instantiates a new Field view holder base.
+         *
+         * @param view the view
+         */
         FieldViewHolderBase(View view) {
             super(view);
             description = (TextView) view.findViewById(R.id.row_field_description);
@@ -131,84 +157,131 @@ public class FieldAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
             actionRight.setVisibility(mEditable ? View.VISIBLE : View.INVISIBLE);
             actionRight.setImageDrawable(mActivity.getResources().getDrawable(R.drawable.close));
 
-            try {
-                final View parentR = (View) actionRight.getParent();
-                parentR.post(() -> {
-                    Rect rectR = new Rect();
-                    actionRight.getHitRect(rectR);
-                    rectR.top -= DeviceUtils.dp2px(DELEGATE_SIZE);
-                    rectR.right += DeviceUtils.dp2px(DELEGATE_SIZE);
-                    rectR.bottom += DeviceUtils.dp2px(DELEGATE_SIZE);
-                    rectR.left -= DeviceUtils.dp2px(DELEGATE_SIZE);
-                    parentR.setTouchDelegate(new TouchDelegate(rectR, actionRight));
-                });
-                final View parentL = (View) actionLeft.getParent();
-                parentL.post(() -> {
-                    Rect rectL = new Rect();
-                    actionLeft.getHitRect(rectL);
-                    rectL.top -= DeviceUtils.dp2px(DELEGATE_SIZE);
-                    rectL.right += DeviceUtils.dp2px(DELEGATE_SIZE);
-                    rectL.bottom += DeviceUtils.dp2px(DELEGATE_SIZE);
-                    rectL.left -= DeviceUtils.dp2px(DELEGATE_SIZE);
-                    parentL.setTouchDelegate(new TouchDelegate(rectL, actionLeft));
-                });
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-
             changeEditTextBehaviour(value, mEditable);
             value.requestFocus();
         }
 
+        /**
+         * Gets description.
+         *
+         * @return the description
+         */
         TextView getDescription() { return description; }
 
+        /**
+         * Sets description.
+         *
+         * @param description the description
+         */
         public void setDescription(TextView description) { this.description = description; }
 
+        /**
+         * Gets value.
+         *
+         * @return the value
+         */
         EditTextDispatched getValue() { return value; }
 
+        /**
+         * Sets value.
+         *
+         * @param value the value
+         */
         void setValue(EditTextDispatched value) { this.value = value; }
 
+        /**
+         * Gets action left.
+         *
+         * @return the action left
+         */
         ImageView getActionLeft() { return actionLeft; }
 
+        /**
+         * Sets action left.
+         *
+         * @param actionLeft the action left
+         */
         void setActionLeft(ImageView actionLeft) { this.actionLeft = actionLeft; }
 
+        /**
+         * Gets action right.
+         *
+         * @return the action right
+         */
         ImageView getActionRight() { return actionRight; }
 
+        /**
+         * Sets action right.
+         *
+         * @param actionRight the action right
+         */
         public void setActionRight(ImageView actionRight) { this.actionRight = actionRight; }
     }
 
+    /**
+     * The type Field view holder text.
+     */
     public class FieldViewHolderText extends FieldViewHolderBase {
 
+        /**
+         * Instantiates a new Field view holder text.
+         *
+         * @param view the view
+         */
         FieldViewHolderText(View view) {
             super(view);
         }
     }
 
+    /**
+     * The type Field view holder number.
+     */
     public class FieldViewHolderNumber extends FieldViewHolderBase {
 
+        /**
+         * Instantiates a new Field view holder number.
+         *
+         * @param view the view
+         */
         FieldViewHolderNumber(View view) {
             super(view);
             getValue().setInputType(InputType.TYPE_CLASS_NUMBER);
         }
     }
 
+    /**
+     * The type Field view holder login.
+     */
     public class FieldViewHolderLogin extends FieldViewHolderBase {
 
+        /**
+         * Instantiates a new Field view holder login.
+         *
+         * @param view the view
+         */
         FieldViewHolderLogin(View view) {
             super(view);
             getActionLeft().setVisibility(View.VISIBLE);
         }
     }
 
+    /**
+     * The type Field view holder password.
+     */
     public class FieldViewHolderPassword extends FieldViewHolderBase {
 
+
+        /**
+         * Instantiates a new Field view holder password.
+         *
+         * @param view the view
+         */
         FieldViewHolderPassword(View view) {
             super(view);
+
             getValue().setSingleLine(true);
             showPasswordField(getValue());
             getActionLeft().setVisibility(View.VISIBLE);
-//            getActionLeft().setImageDrawable(mActivity.getResources().getDrawable(
-//                R.drawable.cube_outline));
             getActionLeft().setImageDrawable(mActivity.getResources().getDrawable(
                 R.drawable.cube_outline));
 
@@ -216,11 +289,12 @@ public class FieldAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
 
             ensureShowGenerator(getValue(), getActionLeft());
         }
+
     }
 
     private void ensureShowGenerator(EditTextDispatched etd, ImageView leftBtn) {
         if (!mEditable) {
-            ensureToggleVisibility(etd, leftBtn);
+//            ensureToggleVisibility(etd, leftBtn);
             return;
         }
         leftBtn.setOnClickListener(new OnClickListener() {
@@ -233,7 +307,7 @@ public class FieldAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
 
     private void ensureToggleVisibility(EditTextDispatched etd, ImageView leftBtn) {
         if (mEditable) {
-            ensureShowGenerator(etd, leftBtn);
+//            ensureShowGenerator(etd, leftBtn);
             return;
         }
         leftBtn.setOnClickListener(v -> {
@@ -254,8 +328,16 @@ public class FieldAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
         etd.setInputType(InputType.TYPE_TEXT_VARIATION_VISIBLE_PASSWORD);
     }
 
+    /**
+     * The type Field view holder otp.
+     */
     public class FieldViewHolderOtp extends FieldViewHolderBase {
 
+        /**
+         * Instantiates a new Field view holder otp.
+         *
+         * @param view the view
+         */
         FieldViewHolderOtp(View view) {
             super(view);
             getActionLeft().setVisibility(View.VISIBLE);
@@ -267,8 +349,16 @@ public class FieldAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
         }
     }
 
+    /**
+     * The type Field view holder url.
+     */
     public class FieldViewHolderUrl extends FieldViewHolderBase {
 
+        /**
+         * Instantiates a new Field view holder url.
+         *
+         * @param view the view
+         */
         FieldViewHolderUrl(View view) {
             super(view);
             getActionLeft()
@@ -277,8 +367,16 @@ public class FieldAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
         }
     }
 
+    /**
+     * The type Field view holder mail.
+     */
     public class FieldViewHolderMail extends FieldViewHolderBase {
 
+        /**
+         * Instantiates a new Field view holder mail.
+         *
+         * @param view the view
+         */
         FieldViewHolderMail(View view) {
             super(view);
             getValue().setInputType(InputType.TYPE_TEXT_VARIATION_EMAIL_ADDRESS);
@@ -286,8 +384,16 @@ public class FieldAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
         }
     }
 
+    /**
+     * The type Field view holder phone.
+     */
     public class FieldViewHolderPhone extends FieldViewHolderBase {
 
+        /**
+         * Instantiates a new Field view holder phone.
+         *
+         * @param view the view
+         */
         FieldViewHolderPhone(View view) {
             super(view);
             getValue().setInputType(InputType.TYPE_CLASS_PHONE);
@@ -295,16 +401,32 @@ public class FieldAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
         }
     }
 
+    /**
+     * The type Field view holder date.
+     */
     public class FieldViewHolderDate extends FieldViewHolderBase {
 
+        /**
+         * Instantiates a new Field view holder date.
+         *
+         * @param view the view
+         */
         FieldViewHolderDate(View view) {
             super(view);
             getValue().setInputType(InputType.TYPE_DATETIME_VARIATION_DATE);
         }
     }
 
+    /**
+     * The type Field view holder pin.
+     */
     public class FieldViewHolderPin extends FieldViewHolderBase {
 
+        /**
+         * Instantiates a new Field view holder pin.
+         *
+         * @param view the view
+         */
         FieldViewHolderPin(View view) {
             super(view);
             getValue().setInputType(InputType.TYPE_NUMBER_VARIATION_PASSWORD);
@@ -316,8 +438,16 @@ public class FieldAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
         }
     }
 
+    /**
+     * The type Field view holder secret.
+     */
     public class FieldViewHolderSecret extends FieldViewHolderBase {
 
+        /**
+         * Instantiates a new Field view holder secret.
+         *
+         * @param view the view
+         */
         FieldViewHolderSecret(View view) {
             super(view);
             getValue().setInputType(InputType.TYPE_CLASS_TEXT);
@@ -429,17 +559,8 @@ public class FieldAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
                 field = mFields.get(position);
                 viewHolderSecret.getDescription().setText(field.getDescription());
                 break;
+
         }
-    }
-
-    @Override
-    public int getItemViewType(int position) {
-        return mFields.get(position).getType().ordinal();
-    }
-
-    @Override
-    public void onViewRecycled(ViewHolder holder) {
-        super.onViewRecycled(holder);
         EditTextDispatched value = (EditTextDispatched) holder.itemView
             .findViewById(R.id.row_field_value);
         ImageButton actionLeft = (ImageButton) holder.itemView
@@ -494,8 +615,26 @@ public class FieldAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
             actionRight.setVisibility(mEditable ? View.VISIBLE : View.VISIBLE);
         }
 
+    }
+
+    @Override
+    public int getItemViewType(int position) {
+        return mFields.get(position).getType().ordinal();
+    }
+
+
+    @Override
+    public void onViewRecycled(ViewHolder holder) {
+        super.onViewRecycled(holder);
+
+        int pos = holder.getAdapterPosition();
+        EditTextDispatched value = (EditTextDispatched) holder.itemView.findViewById(
+            R.id.row_field_value);
+        Log.i(TAG, "onViewRecycled: " + value.getText() + " | pos=" + pos);
+
         changeEditTextBehaviour(value, mEditable);
     }
+
 
     private void hidePasswordField(EditTextDispatched value) {
         value.setInputType(
@@ -507,6 +646,5 @@ public class FieldAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
     public int getItemCount() {
         return mFields.size();
     }
-
 
 }

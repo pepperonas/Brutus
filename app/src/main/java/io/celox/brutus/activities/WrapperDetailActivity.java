@@ -189,7 +189,11 @@ public class WrapperDetailActivity extends AppCompatActivity {
         switch (item.getItemId()) {
             case R.id.action_edit:
                 mFieldAdapter.setEditable(!mFieldAdapter.isEditable());
-                mFieldAdapter.notifyDataSetChanged();
+
+                for (int i = 0; i < mFieldAdapter.getItemCount(); i++) {
+                // update each item itself
+                    mFieldAdapter.notifyItemChanged(i, fields.get(i));
+                }
                 mBtnAddField.setVisibility(mFieldAdapter.isEditable() ? View.VISIBLE : View.GONE);
                 mTvModified.setVisibility(!mFieldAdapter.isEditable() ? View.VISIBLE : View.GONE);
 

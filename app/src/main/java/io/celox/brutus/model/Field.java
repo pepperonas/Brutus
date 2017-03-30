@@ -25,6 +25,7 @@ import android.support.annotation.NonNull;
  */
 public class Field extends AbsBase {
 
+
     public enum Type {
         // clear text
         TEXT(0), NUMBER(1), LOGIN(2),
@@ -45,6 +46,7 @@ public class Field extends AbsBase {
     private String description;
     private String value;
     private Type type;
+//    private int position;
 
     public Field(@NonNull Context context, long created) {
         super(context, created);
@@ -81,4 +83,9 @@ public class Field extends AbsBase {
     public void setType(Type type) {
         this.type = type;
     }
+
+//    public int getPosition() { return position; }
+//
+//    void setPosition(int position) { this.position = position; }
+
 }
