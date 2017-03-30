@@ -19,13 +19,16 @@ package io.celox.brutus.activities;
 import static android.Manifest.permission.READ_CONTACTS;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
+import android.util.Base64;
 import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -34,8 +37,12 @@ import android.widget.EditText;
 import android.widget.TextView;
 import io.celox.brutus.R;
 import io.celox.brutus.Utilities;
-import io.celox.brutus.crypto.CryptoX;
+import io.celox.brutus.crypto.Crypt;
+import io.celox.brutus.crypto.Crypt.CryptSet;
 import io.celox.brutus.crypto.TotpManager;
+import java.util.Map;
+import java.util.Set;
+import javax.crypto.SecretKey;
 
 /**
  * A login screen that offers to set the password.
@@ -79,18 +86,101 @@ public class LoginActivity extends AppCompatActivity {
 
         mViewSetPassword = findViewById(R.id.set_password_form);
 
-        processEncyption();
+        processEncryption();
 
-        processOneTimePassword("");
+//        processOneTimePassword("");
 
 //        scan();
     }
 
-    private void processEncyption() {
+    private void processEncryption() {
+        long start = System.currentTimeMillis();
+
+        SharedPreferences preferences = getPreferences(MODE_PRIVATE);
+
         if (testMakeCryptoConfig) {
-            new CryptoX("hallo");
+
+            SecretKey key = Crypt.getSecretKey("hallo", "kk");
+            Log.d(TAG, "proCrypt: deltaE0=" + (System.currentTimeMillis() - start) + " ms");
+            CryptSet enc1 = Crypt.enc(key, "Franz!");
+            Log.d(TAG, "proCrypt: deltaE1=" + (System.currentTimeMillis() - start) + " ms");
+            CryptSet enc2 = Crypt.enc(key, "Fronz!");
+            CryptSet enc3 = Crypt.enc(key, "Frinz!");
+            CryptSet enc4 = Crypt.enc(key, "Frünz!");
+            Log.d(TAG, "proCrypt: deltaE2=" + (System.currentTimeMillis() - start) + " ms");
+
+            String ee1 = Base64.encodeToString(enc1.getEncrypted(), Base64.DEFAULT);
+            String ei1 = Base64.encodeToString(enc1.getIv(), Base64.DEFAULT);
+            String ee2 = Base64.encodeToString(enc2.getEncrypted(), Base64.DEFAULT);
+            String ei2 = Base64.encodeToString(enc2.getIv(), Base64.DEFAULT);
+            String ee3 = Base64.encodeToString(enc3.getEncrypted(), Base64.DEFAULT);
+            String ei3 = Base64.encodeToString(enc3.getIv(), Base64.DEFAULT);
+            String ee4 = Base64.encodeToString(enc4.getEncrypted(), Base64.DEFAULT);
+            String ei4 = Base64.encodeToString(enc4.getIv(), Base64.DEFAULT);
+            Log.d(TAG, "proCrypt: deltaE3=" + (System.currentTimeMillis() - start) + " ms");
+
+            preferences.edit().putString("ee1", ee1).apply();
+            preferences.edit().putString("ei1", ei1).apply();
+            preferences.edit().putString("ee2", ee2).apply();
+            preferences.edit().putString("ei2", ei2).apply();
+            preferences.edit().putString("ee3", ee3).apply();
+            preferences.edit().putString("ei3", ei3).apply();
+            preferences.edit().putString("ee4", ee4).apply();
+            preferences.edit().putString("ei4", ei4).apply();
+            Log.d(TAG, "proCrypt: deltaE4=" + (System.currentTimeMillis() - start) + " ms");
+
         } else {
-            CryptoX.testDecryption("hallo");
+            byte[] ee1 = Base64.decode(preferences.getString("ee1", ""), Base64.DEFAULT);
+            byte[] ei1 = Base64.decode(preferences.getString("ei1", ""), Base64.DEFAULT);
+            Log.d(TAG, "proCrypt: deltaD0=" + (System.currentTimeMillis() - start) + " ms");
+            byte[] ee2 = Base64.decode(preferences.getString("ee2", ""), Base64.DEFAULT);
+            byte[] ei2 = Base64.decode(preferences.getString("ei2", ""), Base64.DEFAULT);
+            byte[] ee3 = Base64.decode(preferences.getString("ee3", ""), Base64.DEFAULT);
+            byte[] ei3 = Base64.decode(preferences.getString("ei3", ""), Base64.DEFAULT);
+            byte[] ee4 = Base64.decode(preferences.getString("ee4", ""), Base64.DEFAULT);
+            byte[] ei4 = Base64.decode(preferences.getString("ei4", ""), Base64.DEFAULT);
+            Log.d(TAG, "proCrypt: deltaD1=" + (System.currentTimeMillis() - start) + " ms");
+
+            SecretKey key = Crypt.getSecretKey("hallo", "kk");
+            Log.d(TAG, "proCrypt: deltaD2=" + (System.currentTimeMillis() - start) + " ms");
+
+            Log.d(TAG, "e1: " + Crypt.dec(key, ei1, ee1));
+            Log.d(TAG, "proCrypt: deltaD3=" + (System.currentTimeMillis() - start) + " ms");
+            Log.d(TAG, "e2: " + Crypt.dec(key, ei2, ee2));
+            Log.d(TAG, "e3: " + Crypt.dec(key, ei3, ee3));
+            Log.d(TAG, "e4: " + Crypt.dec(key, ei4, ee4));
+            Log.d(TAG, "proCrypt: deltaD4=" + (System.currentTimeMillis() - start) + " ms");
+        }
+
+        loadPreferences();
+    }
+
+    @SuppressWarnings("unchecked")
+    public void loadPreferences() {
+        Map<String, ?> prefs = PreferenceManager.getDefaultSharedPreferences(this).getAll();
+        for (String key : prefs.keySet()) {
+            Object pref = prefs.get(key);
+            String printVal = "";
+            if (pref instanceof Boolean) {
+                printVal = key + " : " + (Boolean) pref;
+            }
+            if (pref instanceof Float) {
+                printVal = key + " : " + (Float) pref;
+            }
+            if (pref instanceof Integer) {
+                printVal = key + " : " + (Integer) pref;
+            }
+            if (pref instanceof Long) {
+                printVal = key + " : " + (Long) pref;
+            }
+            if (pref instanceof String) {
+                printVal = key + " : " + (String) pref;
+            }
+            if (pref instanceof Set<?>) {
+                printVal = key + " : " + (Set<String>) pref;
+            }
+
+            Log.d(TAG, "loadPreferences: " + printVal);
         }
     }
 

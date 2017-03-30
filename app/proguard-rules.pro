@@ -23,3 +23,8 @@
 # If you keep the line number information, uncomment this to
 # hide the original source file name.
 #-renamesourcefileattribute SourceFile
+
+-keep class com.pepperonas.jbasx.** { *; }
+-dontwarn com.pepperonas.jbasx.**
+-keep class com.pepperonas.andbasx.** { *; }
+-dontwarn com.pepperonas.andbasx.**

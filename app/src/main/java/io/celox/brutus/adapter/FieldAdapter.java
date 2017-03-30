@@ -114,9 +114,13 @@ public class FieldAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
     }
 
     public void changeEditTextBehaviour(View base) {
-        EditTextDispatched etd = (EditTextDispatched) base.findViewById(R.id.row_field_value);
-        etd.setEditable(mEditable);
-        etd.setEnabled(mEditable);
+        try {
+            EditTextDispatched etd = (EditTextDispatched) base.findViewById(R.id.row_field_value);
+            etd.setEditable(mEditable);
+            etd.setEnabled(mEditable);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     /**
@@ -624,12 +628,14 @@ public class FieldAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
                 if (mEditable) {
                     viewHolderPin.getActionLeft().setImageDrawable(
                         mActivity.getResources().getDrawable(R.drawable.close));
-                    showPasswordField(viewHolderPin.getValue());
+                    showPasswordFieldPin(viewHolderPin.getValue());
                 } else {
                     hidePasswordFieldPin(viewHolderPin.getValue());
                     viewHolderPin.getActionLeft().setImageDrawable(mActivity.getResources()
                         .getDrawable(viewHolderPin.getValue().getInputType()
-                            == InputType.TYPE_TEXT_VARIATION_VISIBLE_PASSWORD ?
+                            == (InputType.TYPE_CLASS_NUMBER
+                            | InputType.TYPE_NUMBER_FLAG_DECIMAL
+                            | InputType.TYPE_NUMBER_FLAG_SIGNED) ?
                             R.drawable.eye_off : R.drawable.eye));
                     ensureToggleVisibilityPin(viewHolderPin.getValue(),
                         viewHolderPin.getActionLeft());
@@ -684,22 +690,48 @@ public class FieldAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
         });
     }
 
+    private void hidePasswordField(EditTextDispatched value) {
+        value.setInputType(
+            InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD);
+    }
+
+    private void showPasswordField(EditTextDispatched etd) {
+        etd.setInputType(InputType.TYPE_TEXT_VARIATION_VISIBLE_PASSWORD);
+    }
+
     private void ensureToggleVisibilityPin(EditTextDispatched etd, ImageView leftBtn) {
         if (mEditable) {
             return;
         }
         leftBtn.setOnClickListener(v -> {
             if (etd.getInputType() ==
-                InputType.TYPE_NUMBER_VARIATION_PASSWORD) {
+                (InputType.TYPE_CLASS_NUMBER
+                    | InputType.TYPE_NUMBER_FLAG_DECIMAL
+                    | InputType.TYPE_NUMBER_FLAG_SIGNED)) {
                 hidePasswordFieldPin(etd);
             } else {
                 showPasswordFieldPin(etd);
             }
             etd.setSelection(etd.length());
             ((ImageButton) v).setImageDrawable(mActivity.getResources().getDrawable(
-                etd.getInputType() == InputType.TYPE_NUMBER_VARIATION_PASSWORD
+                etd.getInputType() == (InputType.TYPE_CLASS_NUMBER
+                    | InputType.TYPE_NUMBER_FLAG_DECIMAL
+                    | InputType.TYPE_NUMBER_FLAG_SIGNED)
                     ? R.drawable.eye_off : R.drawable.eye));
         });
+    }
+
+    private void hidePasswordFieldPin(EditTextDispatched value) {
+        value.setInputType(InputType.TYPE_CLASS_NUMBER
+            | InputType.TYPE_NUMBER_FLAG_DECIMAL
+            | InputType.TYPE_NUMBER_FLAG_SIGNED
+            | InputType.TYPE_NUMBER_VARIATION_PASSWORD);
+    }
+
+    private void showPasswordFieldPin(EditTextDispatched etd) {
+        etd.setInputType(InputType.TYPE_CLASS_NUMBER
+            | InputType.TYPE_NUMBER_FLAG_DECIMAL
+            | InputType.TYPE_NUMBER_FLAG_SIGNED);
     }
 
     private void ensureShowGenerator(EditTextDispatched etd, ImageView leftBtn) {
@@ -712,24 +744,6 @@ public class FieldAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
                 ToastUtils.toastShort("TODO: implement gen!");
             }
         });
-    }
-
-    private void hidePasswordField(EditTextDispatched value) {
-        value.setInputType(
-            InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD);
-    }
-
-    private void hidePasswordFieldPin(EditTextDispatched value) {
-        value.setInputType(
-            InputType.TYPE_CLASS_NUMBER | InputType.TYPE_NUMBER_VARIATION_PASSWORD);
-    }
-
-    private void showPasswordField(EditTextDispatched etd) {
-        etd.setInputType(InputType.TYPE_TEXT_VARIATION_VISIBLE_PASSWORD);
-    }
-
-    private void showPasswordFieldPin(EditTextDispatched etd) {
-        etd.setInputType(InputType.TYPE_NUMBER_VARIATION_PASSWORD);
     }
 
     @Override
