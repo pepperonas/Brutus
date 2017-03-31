@@ -24,7 +24,6 @@ import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
-import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
@@ -39,6 +38,7 @@ import io.celox.brutus.R;
 import io.celox.brutus.Utilities;
 import io.celox.brutus.crypto.Crypt;
 import io.celox.brutus.crypto.Crypt.CryptSet;
+import io.celox.brutus.crypto.Crypt.KeySet;
 import io.celox.brutus.crypto.TotpManager;
 import java.util.Map;
 import java.util.Set;
@@ -100,7 +100,10 @@ public class LoginActivity extends AppCompatActivity {
 
         if (testMakeCryptoConfig) {
 
-            SecretKey key = Crypt.getSecretKey("hallo", "kk");
+            KeySet keySet = Crypt.getSecretKey("hallo", null);
+            SecretKey key = keySet.getSecretKey();
+            byte[] srBytes = keySet.getSalt();
+
             Log.d(TAG, "proCrypt: deltaE0=" + (System.currentTimeMillis() - start) + " ms");
             CryptSet enc1 = Crypt.enc(key, "Franz!");
             Log.d(TAG, "proCrypt: deltaE1=" + (System.currentTimeMillis() - start) + " ms");
@@ -119,6 +122,9 @@ public class LoginActivity extends AppCompatActivity {
             String ei4 = Base64.encodeToString(enc4.getIv(), Base64.DEFAULT);
             Log.d(TAG, "proCrypt: deltaE3=" + (System.currentTimeMillis() - start) + " ms");
 
+            String secRand = Base64.encodeToString(srBytes, Base64.DEFAULT);
+
+            preferences.edit().putString("sr", secRand).apply();
             preferences.edit().putString("ee1", ee1).apply();
             preferences.edit().putString("ei1", ei1).apply();
             preferences.edit().putString("ee2", ee2).apply();
@@ -141,7 +147,11 @@ public class LoginActivity extends AppCompatActivity {
             byte[] ei4 = Base64.decode(preferences.getString("ei4", ""), Base64.DEFAULT);
             Log.d(TAG, "proCrypt: deltaD1=" + (System.currentTimeMillis() - start) + " ms");
 
-            SecretKey key = Crypt.getSecretKey("hallo", "kk");
+            byte[] srBytes = Base64.decode(preferences.getString("sr", ""), Base64.DEFAULT);
+
+            KeySet keySet = Crypt.getSecretKey("hallo", srBytes);
+            SecretKey key = keySet.getSecretKey();
+
             Log.d(TAG, "proCrypt: deltaD2=" + (System.currentTimeMillis() - start) + " ms");
 
             Log.d(TAG, "e1: " + Crypt.dec(key, ei1, ee1));
@@ -157,7 +167,9 @@ public class LoginActivity extends AppCompatActivity {
 
     @SuppressWarnings("unchecked")
     public void loadPreferences() {
-        Map<String, ?> prefs = PreferenceManager.getDefaultSharedPreferences(this).getAll();
+    SharedPreferences preferences = getPreferences(MODE_PRIVATE);
+        Map<String, ?> prefs = preferences.getAll();
+//        Map<String, ?> prefs = PreferenceManager.getDefaultSharedPreferences(this).getAll();
         for (String key : prefs.keySet()) {
             Object pref = prefs.get(key);
             String printVal = "";

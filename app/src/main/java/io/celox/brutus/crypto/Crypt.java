@@ -16,11 +16,13 @@
 
 package io.celox.brutus.crypto;
 
+import android.support.annotation.Nullable;
 import java.io.UnsupportedEncodingException;
 import java.security.AlgorithmParameters;
 import java.security.InvalidAlgorithmParameterException;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
+import java.security.SecureRandom;
 import java.security.spec.InvalidKeySpecException;
 import java.security.spec.InvalidParameterSpecException;
 import java.security.spec.KeySpec;
@@ -38,15 +40,8 @@ import javax.crypto.spec.SecretKeySpec;
  * The type Crypt.
  *
  * @author Martin Pfeffer
- * @see <a href="https://celox.io">https://celox.io</a>
- *
- * Loading times measured on device:
- *
- * PHONE = Google Pixel (late 2016)
- *
- * LAPTOP = Macbook Pro (mid 2015)
- *
- * TEXT-LENGTH = short ( ~6 chars)
+ * @see <a href="https://celox.io">https://celox.io</a> Loading times measured on device: PHONE =
+ * Google Pixel (late 2016) LAPTOP = Macbook Pro (mid 2015) TEXT-LENGTH = short ( ~6 chars)
  */
 public class Crypt {
 
@@ -58,6 +53,10 @@ public class Crypt {
      * The constant KEY_SIZE.
      */
     public static final int KEY_SIZE = 256;
+    /**
+     * The constant SEED_SIZE.
+     */
+    public static final int SEED_SIZE = 8;
 
     /**
      * The type Crypt set.
@@ -94,6 +93,45 @@ public class Crypt {
          */
         public byte[] getIv() {
             return iv;
+        }
+    }
+
+
+    /**
+     * The type Key set.
+     */
+    public static class KeySet {
+
+        private SecretKey secretKey;
+        private byte[] salt;
+
+        /**
+         * Instantiates a new Key set.
+         *
+         * @param secretKey the secret key
+         * @param salt the salt
+         */
+        public KeySet(SecretKey secretKey, byte[] salt) {
+            this.secretKey = secretKey;
+            this.salt = salt;
+        }
+
+        /**
+         * Gets secret key.
+         *
+         * @return the secret key
+         */
+        public SecretKey getSecretKey() {
+            return secretKey;
+        }
+
+        /**
+         * Get salt byte [ ].
+         *
+         * @return the byte [ ]
+         */
+        public byte[] getSalt() {
+            return salt;
         }
     }
 
@@ -227,17 +265,30 @@ public class Crypt {
      * Laptop: ~ 330ms
      *
      * @param password the password
-     * @param salt the salt
+     * @param srBytes the sr bytes, pass {@null} to generate a new {@java.security.SecureRandom}
      * @return the secret key
      */
-    public static SecretKey getSecretKey(String password, String salt) {
+    public static KeySet getSecretKey(String password, @Nullable byte[] srBytes) {
+        SecureRandom sr = null;
+        if (srBytes == null) {
+            try {
+                sr = SecureRandom.getInstance("SHA1PRNG");
+                sr.setSeed("abcdefghijklmnop".getBytes("us-ascii"));
+                srBytes = sr.generateSeed(SEED_SIZE);
+            } catch (NoSuchAlgorithmException e) {
+                e.printStackTrace();
+            } catch (UnsupportedEncodingException e) {
+                e.printStackTrace();
+            }
+        }
+
         SecretKeyFactory factory = null;
         try {
             factory = SecretKeyFactory.getInstance("PBKDF2WithHmacSHA256");
         } catch (NoSuchAlgorithmException e) {
             e.printStackTrace();
         }
-        KeySpec spec = new PBEKeySpec(password.toCharArray(), salt.getBytes(),
+        KeySpec spec = new PBEKeySpec(password.toCharArray(), srBytes,
             DERIVATION_ITERATION_COUNT, KEY_SIZE);
         SecretKey tmp = null;
         try {
@@ -248,7 +299,7 @@ public class Crypt {
             e.printStackTrace();
         }
         if (tmp != null) {
-            return new SecretKeySpec(tmp.getEncoded(), "AES");
+            return new KeySet(new SecretKeySpec(tmp.getEncoded(), "AES"), srBytes);
         }
         return null;
     }
