@@ -635,6 +635,7 @@ public class FieldAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
                         | InputType.TYPE_NUMBER_FLAG_DECIMAL
                         | InputType.TYPE_NUMBER_FLAG_SIGNED)
                         ? R.drawable.eye_off : R.drawable.eye));
+
                     ensureToggleVisibilityPin(vhPin.getValue(), vhPin.getActionLeft());
                 }
 
@@ -659,6 +660,7 @@ public class FieldAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
                         .setImageDrawable(getIcon(vhSecret.getValue().getInputType()
                             == InputType.TYPE_TEXT_VARIATION_VISIBLE_PASSWORD
                             ? R.drawable.eye_off : R.drawable.eye));
+
                     ensureToggleVisibility(vhSecret.getValue(), vhSecret.getActionLeft());
                 }
             }
@@ -677,16 +679,17 @@ public class FieldAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
             } else {
                 showPasswordField(etd);
             }
+
             etd.setSelection(etd.length());
-            ((ImageButton) v).setImageDrawable(
-                getIcon(etd.getInputType() == InputType.TYPE_TEXT_VARIATION_VISIBLE_PASSWORD
-                    ? R.drawable.eye_off : R.drawable.eye));
+
+            ((ImageButton) v).setImageDrawable(getIcon(etd.getInputType()
+                == InputType.TYPE_TEXT_VARIATION_VISIBLE_PASSWORD
+                ? R.drawable.eye_off : R.drawable.eye));
         });
     }
 
     private void hidePasswordField(EditTextDispatched value) {
-        value.setInputType(
-            InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD);
+        value.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD);
     }
 
     private void showPasswordField(EditTextDispatched etd) {
@@ -697,6 +700,7 @@ public class FieldAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
         if (mEditable) {
             return;
         }
+
         leftBtn.setOnClickListener(v -> {
             if (etd.getInputType() ==
                 (InputType.TYPE_CLASS_NUMBER
@@ -706,6 +710,7 @@ public class FieldAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
             } else {
                 showPasswordFieldPin(etd);
             }
+
             etd.setSelection(etd.length());
             ((ImageButton) v).setImageDrawable(getIcon(
                 etd.getInputType() == (InputType.TYPE_CLASS_NUMBER
@@ -732,6 +737,7 @@ public class FieldAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
         if (!mEditable) {
             return;
         }
+
         leftBtn.setOnClickListener(v -> ToastUtils.toastShort("TODO: implement gen!"));
     }
 
