@@ -35,11 +35,9 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 import io.celox.brutus.R;
-import io.celox.brutus.Utilities;
 import io.celox.brutus.crypto.Crypt;
 import io.celox.brutus.crypto.Crypt.CryptSet;
 import io.celox.brutus.crypto.Crypt.KeySet;
-import io.celox.brutus.crypto.TotpManager;
 import java.util.Map;
 import java.util.Set;
 import javax.crypto.SecretKey;
@@ -51,7 +49,7 @@ public class LoginActivity extends AppCompatActivity {
 
     private static final String TAG = "LoginActivity";
 
-    boolean testMakeCryptoConfig = false;
+    boolean testMakeCryptoConfig = true;
 
     /**
      * Id to identity READ_CONTACTS permission request.
@@ -196,19 +194,6 @@ public class LoginActivity extends AppCompatActivity {
         }
     }
 
-    private void processOneTimePassword(String privateKey) {
-        try {
-            byte[] decodedKey = Utilities.fromBase32(privateKey);
-            String hexKey = Utilities.toHex(decodedKey);
-            Log.d(TAG, "onCreate: hexKey=" + hexKey + " | " + hexKey.length() * 4 + " bits");
-
-            TotpManager totpManager = new TotpManager();
-            String code = totpManager.generate(decodedKey);
-            Log.d(TAG, "onCreate: code=" + code);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
 
 
     private void scan() {

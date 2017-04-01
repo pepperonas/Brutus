@@ -17,13 +17,13 @@
 package io.celox.brutus.adapter;
 
 import android.app.Activity;
+import android.graphics.drawable.Drawable;
 import android.os.Handler;
+import android.support.annotation.DrawableRes;
 import android.support.v7.widget.RecyclerView;
 import android.text.InputType;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.ImageButton;
 import android.widget.ImageView;
@@ -31,6 +31,7 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import com.pepperonas.andbasx.base.ToastUtils;
 import io.celox.brutus.R;
+import io.celox.brutus.Utilities;
 import io.celox.brutus.custom.EditTextDispatched;
 import io.celox.brutus.model.Field;
 import io.celox.brutus.model.Field.Type;
@@ -51,23 +52,25 @@ public class FieldAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
 
     private static final String TAG = "FieldAdapter";
 
+    public static final int OTP_TIMER_PERIOD = 999;
+
     // animating OPT validity
     private List<ProgressBar> mProgressBarList = new ArrayList<>();
+
     private int mProgressCounter = 0;
     private boolean mCountForward = true;
     private Handler mHandler = new Handler();
     private Calendar mCalendar = Calendar.getInstance();
     private boolean mAnimating = false;
     private Timer mTimer = new Timer();
+
+
     private TimerTask mAnimationTask = new TimerTask() {
         public void run() {
             mHandler.post(() -> {
                 mAnimating = true;
 
                 mCalendar.setTime(new Date(System.currentTimeMillis()));
-                int seconds = mCalendar.get(Calendar.SECOND);
-
-                mCountForward = seconds < 30;
 
                 if (mProgressCounter >= 300) {
                     mCountForward = false;
@@ -81,7 +84,6 @@ public class FieldAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
                     mProgressCounter -= 10;
                 }
 
-                Log.d(TAG, "progressCounter=" + mProgressCounter);
                 for (ProgressBar pb : mProgressBarList) {
                     if (pb != null) {
                         pb.setProgress(mProgressCounter);
@@ -90,7 +92,6 @@ public class FieldAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
             });
         }
     };
-
 
     private boolean mEditable = false;
     private Activity mActivity;
@@ -161,7 +162,7 @@ public class FieldAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
             actionRight = (ImageView) view.findViewById(R.id.row_field_action_right);
             actionLeft.setVisibility(View.GONE);
             actionRight.setVisibility(mEditable ? View.VISIBLE : View.INVISIBLE);
-            actionRight.setImageDrawable(mActivity.getResources().getDrawable(R.drawable.close));
+            actionRight.setImageDrawable(getIcon(R.drawable.close));
 
             changeEditTextBehaviour(view);
             value.requestFocus();
@@ -285,8 +286,7 @@ public class FieldAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
 
             getValue().setSingleLine(true);
             showPasswordField(getValue());
-            getActionLeft().setImageDrawable(mActivity.getResources().getDrawable(
-                R.drawable.cube_outline));
+            getActionLeft().setImageDrawable(getIcon(R.drawable.cube_outline));
 
             ensureToggleVisibility(getValue(), getActionLeft());
 
@@ -310,7 +310,7 @@ public class FieldAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
             super(view);
 
             if (!mAnimating) {
-                mTimer.schedule(mAnimationTask, 0, 1002);
+                mTimer.schedule(mAnimationTask, 0, OTP_TIMER_PERIOD);
             }
         }
     }
@@ -391,9 +391,7 @@ public class FieldAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
         FieldViewHolderPin(View view) {
             super(view);
             getValue().setInputType(InputType.TYPE_NUMBER_VARIATION_PASSWORD);
-            getActionLeft().setImageDrawable(mActivity.getResources()
-                .getDrawable(R.drawable.close));
-
+            getActionLeft().setImageDrawable(getIcon(R.drawable.close));
             ensureToggleVisibility(getValue(), getActionLeft());
         }
     }
@@ -411,13 +409,13 @@ public class FieldAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
         FieldViewHolderSecret(View view) {
             super(view);
             getValue().setInputType(InputType.TYPE_CLASS_TEXT);
-            getActionLeft().setImageDrawable(mActivity.getResources()
-                .getDrawable(R.drawable.close));
+            getActionLeft().setImageDrawable(getIcon(R.drawable.close));
 
+            getActionRight().setOnClickListener(v -> removeField(this));
             ensureToggleVisibility(getValue(), getActionLeft());
         }
-    }
 
+    }
 
     @Override
     public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
@@ -459,213 +457,209 @@ public class FieldAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
         return null;
     }
 
+
     @Override
     public void onBindViewHolder(RecyclerView.ViewHolder holder, int position) {
         Field field;
         switch (Type.values()[holder.getItemViewType()]) {
 
             case TEXT: {
-                FieldViewHolderText viewHolderText = (FieldViewHolderText) holder;
+                FieldViewHolderText vhText = (FieldViewHolderText) holder;
                 field = mFields.get(position);
-                viewHolderText.getDescription().setText(field.getDescription());
+                vhText.getDescription().setText(field.getDescription());
 
-                viewHolderText.getActionLeft().setVisibility(View.GONE);
-                viewHolderText.getActionRight().setVisibility(mEditable ? View.VISIBLE : View.GONE);
+                vhText.getActionLeft().setVisibility(View.GONE);
+                vhText.getActionRight().setVisibility(mEditable ? View.VISIBLE : View.GONE);
+
+                vhText.getActionRight().setOnClickListener(v -> removeField(vhText));
                 break;
             }
 
             case NUMBER: {
-                FieldViewHolderNumber viewHolderNumber = (FieldViewHolderNumber) holder;
+                FieldViewHolderNumber vhNumber = (FieldViewHolderNumber) holder;
                 field = mFields.get(position);
-                viewHolderNumber.getDescription().setText(field.getDescription());
+                vhNumber.getDescription().setText(field.getDescription());
 
-                viewHolderNumber.getActionLeft().setVisibility(View.GONE);
-                viewHolderNumber.getActionRight()
-                    .setVisibility(mEditable ? View.VISIBLE : View.GONE);
+                vhNumber.getActionLeft().setVisibility(View.GONE);
+                vhNumber.getActionRight().setVisibility(mEditable ? View.VISIBLE : View.GONE);
+
+                vhNumber.getActionRight().setOnClickListener(v -> removeField(vhNumber));
                 break;
             }
 
             case LOGIN: {
-                FieldViewHolderLogin viewHolderLogin = (FieldViewHolderLogin) holder;
+                FieldViewHolderLogin vhLogin = (FieldViewHolderLogin) holder;
                 field = mFields.get(position);
-                viewHolderLogin.getDescription().setText(field.getDescription());
+                vhLogin.getDescription().setText(field.getDescription());
 
-                viewHolderLogin.getActionLeft()
-                    .setVisibility(mEditable ? View.VISIBLE : View.GONE);
-                viewHolderLogin.getActionRight()
-                    .setVisibility(mEditable ? View.VISIBLE : View.GONE);
+                vhLogin.getActionLeft().setVisibility(mEditable ? View.VISIBLE : View.GONE);
+                vhLogin.getActionRight().setVisibility(mEditable ? View.VISIBLE : View.GONE);
 
-                viewHolderLogin.getActionLeft().setImageDrawable(mActivity.getResources()
-                    .getDrawable(R.drawable.account));
+                vhLogin.getActionLeft().setImageDrawable(getIcon(R.drawable.account));
+
+                vhLogin.getActionRight().setOnClickListener(v -> removeField(vhLogin));
 
                 break;
             }
 
             case PASSWORD: {
-                FieldViewHolderPassword viewHolderPassword = (FieldViewHolderPassword) holder;
+                FieldViewHolderPassword vhPassword = (FieldViewHolderPassword) holder;
                 field = mFields.get(position);
-                viewHolderPassword.getDescription().setText(field.getDescription());
-                viewHolderPassword.getActionLeft()
-                    .setVisibility(mEditable ? View.VISIBLE : View.VISIBLE);
-                viewHolderPassword.getActionRight()
-                    .setVisibility(mEditable ? View.VISIBLE : View.GONE);
+                vhPassword.getDescription().setText(field.getDescription());
+                vhPassword.getActionLeft().setVisibility(mEditable ? View.VISIBLE : View.VISIBLE);
+                vhPassword.getActionRight().setVisibility(mEditable ? View.VISIBLE : View.GONE);
 
                 if (mEditable) {
-                    viewHolderPassword.getActionLeft().setImageDrawable(
-                        mActivity.getResources().getDrawable(R.drawable.cube_outline));
-                    showPasswordField(viewHolderPassword.getValue());
-                    ensureShowGenerator(viewHolderPassword.getValue(),
-                        viewHolderPassword.getActionLeft());
+                    vhPassword.getActionLeft().setImageDrawable(getIcon(R.drawable.cube_outline));
+                    showPasswordField(vhPassword.getValue());
+
+                    ensureShowGenerator(vhPassword.getValue(), vhPassword.getActionLeft());
+
+                    vhPassword.getActionRight().setOnClickListener(v -> removeField(vhPassword));
                 } else {
-                    hidePasswordField(viewHolderPassword.getValue());
-                    viewHolderPassword.getActionLeft().setImageDrawable(mActivity.getResources()
-                        .getDrawable(viewHolderPassword.getValue().getInputType()
-                            == InputType.TYPE_TEXT_VARIATION_VISIBLE_PASSWORD ?
-                            R.drawable.eye_off : R.drawable.eye));
-                    ensureToggleVisibility(viewHolderPassword.getValue(),
-                        viewHolderPassword.getActionLeft());
+                    hidePasswordField(vhPassword.getValue());
+                    vhPassword.getActionLeft().setImageDrawable(
+                        getIcon(vhPassword.getValue().getInputType()
+                            == InputType.TYPE_TEXT_VARIATION_VISIBLE_PASSWORD
+                            ? R.drawable.eye_off : R.drawable.eye));
+                    ensureToggleVisibility(vhPassword.getValue(), vhPassword.getActionLeft());
                 }
                 break;
             }
 
             case OTP: {
-                FieldViewHolderOtp viewHolderOtp = (FieldViewHolderOtp) holder;
+                FieldViewHolderOtp vhOtp = (FieldViewHolderOtp) holder;
                 field = mFields.get(position);
-                viewHolderOtp.getDescription().setText(field.getDescription());
+                vhOtp.getDescription().setText(field.getDescription());
 
                 ProgressBar progressBar = (ProgressBar) holder.itemView
                     .findViewById(R.id.row_field_progressbar);
-                viewHolderOtp.getActionLeft().setVisibility(mEditable ? View.VISIBLE : View.GONE);
-                viewHolderOtp.getActionRight()
-                    .setVisibility(mEditable ? View.VISIBLE : View.INVISIBLE);
+                vhOtp.getActionLeft().setVisibility(mEditable ? View.VISIBLE : View.GONE);
+                vhOtp.getActionRight().setVisibility(mEditable ? View.VISIBLE : View.INVISIBLE);
 
-                viewHolderOtp.getActionLeft().setImageDrawable(mActivity.getResources()
-                    .getDrawable(R.drawable.qrcode_scan));
+                vhOtp.getActionLeft().setImageDrawable(getIcon(R.drawable.qrcode_scan));
+
+                vhOtp.getActionRight().setOnClickListener(v -> removeField(vhOtp));
 
                 progressBar.setVisibility(mEditable ? View.INVISIBLE : View.VISIBLE);
 
                 mProgressBarList.add(progressBar);
+
+                // TODO 2017-04-01 00-37: remove otpKey
+                String otpKey = "RZD5U2VM7UKCKTNVQ4KZ75X5LR34RM5I";
+                vhOtp.getValue().setText(Utilities.generateOneTimePassword(otpKey));
                 break;
             }
 
             case URL: {
-                FieldViewHolderUrl viewHolderUrl = (FieldViewHolderUrl) holder;
+                FieldViewHolderUrl vhUrl = (FieldViewHolderUrl) holder;
                 field = mFields.get(position);
-                viewHolderUrl.getDescription().setText(field.getDescription());
+                vhUrl.getDescription().setText(field.getDescription());
 
-                viewHolderUrl.getActionLeft().setVisibility(mEditable ? View.GONE : View.GONE);
-                viewHolderUrl.getActionRight()
-                    .setVisibility(mEditable ? View.VISIBLE : View.VISIBLE);
+                vhUrl.getActionLeft().setVisibility(mEditable ? View.GONE : View.GONE);
+                vhUrl.getActionRight().setVisibility(mEditable ? View.VISIBLE : View.VISIBLE);
 
                 if (mEditable) {
-                    viewHolderUrl.getActionRight().setImageDrawable(mActivity.getResources()
-                        .getDrawable(R.drawable.close));
+                    vhUrl.getActionRight().setImageDrawable(getIcon(R.drawable.close));
+                    vhUrl.getActionRight().setOnClickListener(v -> removeField(vhUrl));
                 } else {
-                    viewHolderUrl.getActionRight().setImageDrawable(mActivity.getResources()
-                        .getDrawable(R.drawable.earth));
+                    vhUrl.getActionRight().setImageDrawable(getIcon(R.drawable.earth));
                 }
                 break;
             }
 
             case MAIL: {
-                FieldViewHolderMail viewHolderMail = (FieldViewHolderMail) holder;
+                FieldViewHolderMail vhMail = (FieldViewHolderMail) holder;
                 field = mFields.get(position);
-                viewHolderMail.getDescription().setText(field.getDescription());
+                vhMail.getDescription().setText(field.getDescription());
 
-                viewHolderMail.getActionLeft().setVisibility(mEditable ? View.GONE : View.GONE);
-                viewHolderMail.getActionRight()
-                    .setVisibility(mEditable ? View.VISIBLE : View.VISIBLE);
+                vhMail.getActionLeft().setVisibility(mEditable ? View.GONE : View.GONE);
+                vhMail.getActionRight().setVisibility(mEditable ? View.VISIBLE : View.VISIBLE);
 
                 if (mEditable) {
-                    viewHolderMail.getActionRight().setImageDrawable(mActivity.getResources()
-                        .getDrawable(R.drawable.close));
+                    vhMail.getActionRight().setImageDrawable(getIcon(R.drawable.close));
+                    vhMail.getActionRight().setOnClickListener(v -> removeField(vhMail));
                 } else {
-                    viewHolderMail.getActionRight().setImageDrawable(mActivity.getResources()
-                        .getDrawable(R.drawable.message_text_outline));
+                    vhMail.getActionRight()
+                        .setImageDrawable(getIcon(R.drawable.message_text_outline));
                 }
                 break;
             }
 
             case PHONE: {
-                FieldViewHolderPhone viewHolderPhone = (FieldViewHolderPhone) holder;
+                FieldViewHolderPhone vhPhone = (FieldViewHolderPhone) holder;
                 field = mFields.get(position);
-                viewHolderPhone.getDescription().setText(field.getDescription());
+                vhPhone.getDescription().setText(field.getDescription());
 
-                viewHolderPhone.getActionLeft().setVisibility(mEditable ? View.GONE : View.GONE);
-                viewHolderPhone.getActionRight()
-                    .setVisibility(mEditable ? View.VISIBLE : View.VISIBLE);
+                vhPhone.getActionLeft().setVisibility(mEditable ? View.GONE : View.GONE);
+                vhPhone.getActionRight().setVisibility(mEditable ? View.VISIBLE : View.VISIBLE);
 
                 if (mEditable) {
-                    viewHolderPhone.getActionRight().setImageDrawable(mActivity.getResources()
-                        .getDrawable(R.drawable.close));
+                    vhPhone.getActionRight().setImageDrawable(getIcon(R.drawable.close));
+                    vhPhone.getActionRight().setOnClickListener(v -> removeField(vhPhone));
                 } else {
-                    viewHolderPhone.getActionRight().setImageDrawable(mActivity.getResources()
-                        .getDrawable(R.drawable.phone));
+                    vhPhone.getActionRight().setImageDrawable(getIcon(R.drawable.phone));
                 }
                 break;
             }
 
             case DATE: {
-                FieldViewHolderDate viewHolderDate = (FieldViewHolderDate) holder;
+                FieldViewHolderDate vhDate = (FieldViewHolderDate) holder;
                 field = mFields.get(position);
-                viewHolderDate.getDescription().setText(field.getDescription());
+                vhDate.getDescription().setText(field.getDescription());
 
-                viewHolderDate.getActionLeft().setVisibility(View.GONE);
-                viewHolderDate.getActionRight().setVisibility(mEditable ? View.VISIBLE : View.GONE);
+                vhDate.getActionLeft().setVisibility(View.GONE);
+                vhDate.getActionRight().setVisibility(mEditable ? View.VISIBLE : View.GONE);
+
+                vhDate.getActionRight().setOnClickListener(v -> removeField(vhDate));
                 break;
             }
 
             case PIN: {
-                FieldViewHolderPin viewHolderPin = (FieldViewHolderPin) holder;
+                FieldViewHolderPin vhPin = (FieldViewHolderPin) holder;
                 field = mFields.get(position);
-                viewHolderPin.getDescription().setText(field.getDescription());
+                vhPin.getDescription().setText(field.getDescription());
 
-                viewHolderPin.getActionLeft()
-                    .setVisibility(mEditable ? View.VISIBLE : View.VISIBLE);
-                viewHolderPin.getActionRight()
-                    .setVisibility(mEditable ? View.GONE : View.GONE);
+                vhPin.getActionLeft().setVisibility(mEditable ? View.GONE : View.VISIBLE);
+                vhPin.getActionRight().setVisibility(mEditable ? View.VISIBLE : View.GONE);
+
+                vhPin.getActionRight().setOnClickListener(v -> removeField(vhPin));
 
                 if (mEditable) {
-                    viewHolderPin.getActionLeft().setImageDrawable(
-                        mActivity.getResources().getDrawable(R.drawable.close));
-                    showPasswordFieldPin(viewHolderPin.getValue());
+                    vhPin.getActionLeft().setImageDrawable(getIcon(R.drawable.close));
+                    showPasswordFieldPin(vhPin.getValue());
                 } else {
-                    hidePasswordFieldPin(viewHolderPin.getValue());
-                    viewHolderPin.getActionLeft().setImageDrawable(mActivity.getResources()
-                        .getDrawable(viewHolderPin.getValue().getInputType()
-                            == (InputType.TYPE_CLASS_NUMBER
-                            | InputType.TYPE_NUMBER_FLAG_DECIMAL
-                            | InputType.TYPE_NUMBER_FLAG_SIGNED) ?
-                            R.drawable.eye_off : R.drawable.eye));
-                    ensureToggleVisibilityPin(viewHolderPin.getValue(),
-                        viewHolderPin.getActionLeft());
+                    hidePasswordFieldPin(vhPin.getValue());
+                    vhPin.getActionLeft().setImageDrawable(getIcon(vhPin.getValue().getInputType()
+                        == (InputType.TYPE_CLASS_NUMBER
+                        | InputType.TYPE_NUMBER_FLAG_DECIMAL
+                        | InputType.TYPE_NUMBER_FLAG_SIGNED)
+                        ? R.drawable.eye_off : R.drawable.eye));
+                    ensureToggleVisibilityPin(vhPin.getValue(), vhPin.getActionLeft());
                 }
 
                 break;
             }
 
             case SECRET: {
-                FieldViewHolderSecret viewHolderSecret = (FieldViewHolderSecret) holder;
+                FieldViewHolderSecret vhSecret = (FieldViewHolderSecret) holder;
                 field = mFields.get(position);
-                viewHolderSecret.getDescription().setText(field.getDescription());
+                vhSecret.getDescription().setText(field.getDescription());
 
-                viewHolderSecret.getActionLeft()
-                    .setVisibility(mEditable ? View.VISIBLE : View.VISIBLE);
-                viewHolderSecret.getActionRight()
-                    .setVisibility(mEditable ? View.GONE : View.GONE);
+                vhSecret.getActionLeft().setVisibility(mEditable ? View.GONE : View.VISIBLE);
+                vhSecret.getActionRight().setVisibility(mEditable ? View.VISIBLE : View.GONE);
 
                 if (mEditable) {
-                    viewHolderSecret.getActionLeft().setImageDrawable(
-                        mActivity.getResources().getDrawable(R.drawable.close));
-                    showPasswordField(viewHolderSecret.getValue());
+                    vhSecret.getActionLeft().setImageDrawable(getIcon(R.drawable.close));
+                    showPasswordField(vhSecret.getValue());
+                    vhSecret.getActionRight().setOnClickListener(v -> removeField(vhSecret));
                 } else {
-                    hidePasswordField(viewHolderSecret.getValue());
-                    viewHolderSecret.getActionLeft().setImageDrawable(mActivity.getResources()
-                        .getDrawable(viewHolderSecret.getValue().getInputType()
-                            == InputType.TYPE_TEXT_VARIATION_VISIBLE_PASSWORD ?
-                            R.drawable.eye_off : R.drawable.eye));
-                    ensureToggleVisibility(viewHolderSecret.getValue(),
-                        viewHolderSecret.getActionLeft());
+                    hidePasswordField(vhSecret.getValue());
+                    vhSecret.getActionLeft()
+                        .setImageDrawable(getIcon(vhSecret.getValue().getInputType()
+                            == InputType.TYPE_TEXT_VARIATION_VISIBLE_PASSWORD
+                            ? R.drawable.eye_off : R.drawable.eye));
+                    ensureToggleVisibility(vhSecret.getValue(), vhSecret.getActionLeft());
                 }
             }
             break;
@@ -677,15 +671,15 @@ public class FieldAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
             return;
         }
         leftBtn.setOnClickListener(v -> {
-            if (etd.getInputType() ==
-                InputType.TYPE_TEXT_VARIATION_VISIBLE_PASSWORD) {
+            if (etd.getInputType()
+                == InputType.TYPE_TEXT_VARIATION_VISIBLE_PASSWORD) {
                 hidePasswordField(etd);
             } else {
                 showPasswordField(etd);
             }
             etd.setSelection(etd.length());
-            ((ImageButton) v).setImageDrawable(mActivity.getResources().getDrawable(
-                etd.getInputType() == InputType.TYPE_TEXT_VARIATION_VISIBLE_PASSWORD
+            ((ImageButton) v).setImageDrawable(
+                getIcon(etd.getInputType() == InputType.TYPE_TEXT_VARIATION_VISIBLE_PASSWORD
                     ? R.drawable.eye_off : R.drawable.eye));
         });
     }
@@ -713,7 +707,7 @@ public class FieldAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
                 showPasswordFieldPin(etd);
             }
             etd.setSelection(etd.length());
-            ((ImageButton) v).setImageDrawable(mActivity.getResources().getDrawable(
+            ((ImageButton) v).setImageDrawable(getIcon(
                 etd.getInputType() == (InputType.TYPE_CLASS_NUMBER
                     | InputType.TYPE_NUMBER_FLAG_DECIMAL
                     | InputType.TYPE_NUMBER_FLAG_SIGNED)
@@ -738,12 +732,16 @@ public class FieldAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
         if (!mEditable) {
             return;
         }
-        leftBtn.setOnClickListener(new OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                ToastUtils.toastShort("TODO: implement gen!");
-            }
-        });
+        leftBtn.setOnClickListener(v -> ToastUtils.toastShort("TODO: implement gen!"));
+    }
+
+    private void removeField(FieldViewHolderBase viewHolderBase) {
+        mFields.remove(viewHolderBase.getLayoutPosition());
+        notifyDataSetChanged();
+    }
+
+    private Drawable getIcon(@DrawableRes int iconId) {
+        return mActivity.getResources().getDrawable(iconId);
     }
 
     @Override

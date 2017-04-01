@@ -16,22 +16,54 @@
 
 package io.celox.brutus;
 
+import android.support.annotation.NonNull;
+import io.celox.brutus.crypto.TotpManager;
 import java.math.BigInteger;
 import org.apache.commons.codec.binary.Base32;
 
 /**
+ * The type Utilities.
+ *
  * @author Martin Pfeffer
  * @see <a href="https://celox.io">https://celox.io</a>
  */
 public class Utilities {
 
-    public static final String toHex(byte[] secret) {
+    private static final String TAG = "Utilities";
+
+    /**
+     * To hex string.
+     *
+     * @param secret the secret
+     * @return the string
+     */
+    public static final String toHex(@NonNull byte[] secret) {
         return String.format("%x", new BigInteger(1, secret));
     }
 
 
-    public static final byte[] fromBase32(String base32) {
+    /**
+     * From base 32 byte [ ].
+     *
+     * @param base32 the base 32
+     * @return the byte [ ]
+     */
+    public static final byte[] fromBase32(@NonNull String base32) {
         return new Base32().decode(base32);
+    }
+
+
+    public static String generateOneTimePassword(@NonNull String privateKey) {
+        try {
+            byte[] decodedKey = Utilities.fromBase32(privateKey);
+            String hexKey = Utilities.toHex(decodedKey);
+            TotpManager totpManager = new TotpManager();
+            String code = totpManager.generate(decodedKey);
+            return code;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
     }
 
 }

@@ -102,50 +102,61 @@ public class WrapperDetailActivity extends AppCompatActivity {
             mp.show();
             mp.setOnMenuItemClickListener(item -> {
                 switch (item.getItemId()) {
-                    case R.id.popup_field_chooser_text:
+                    case R.id.popup_field_chooser_text: {
                         fields.add(new Field(this, System.currentTimeMillis(),
                             getString(R.string.field_text), "T", Type.TEXT));
                         break;
-                    case R.id.popup_field_chooser_number:
+                    }
+                    case R.id.popup_field_chooser_number: {
                         fields.add(new Field(this, System.currentTimeMillis(),
                             getString(R.string.field_number), "N", Type.NUMBER));
                         break;
-                    case R.id.popup_field_chooser_login:
+                    }
+                    case R.id.popup_field_chooser_login: {
                         fields.add(new Field(this, System.currentTimeMillis(),
                             getString(R.string.field_login), "L", Type.LOGIN));
                         break;
-                    case R.id.popup_field_chooser_password:
+                    }
+                    case R.id.popup_field_chooser_password: {
                         fields.add(new Field(this, System.currentTimeMillis(),
                             getString(R.string.field_password), "P", Type.PASSWORD));
                         break;
-                    case R.id.popup_field_chooser_otp:
+                    }
+                    case R.id.popup_field_chooser_otp: {
                         fields.add(new Field(this, System.currentTimeMillis(),
                             getString(R.string.field_otp), "O", Type.OTP));
                         break;
-                    case R.id.popup_field_chooser_url:
+                    }
+                    case R.id.popup_field_chooser_url: {
                         fields.add(new Field(this, System.currentTimeMillis(),
                             getString(R.string.field_url), "U", Type.URL));
                         break;
-                    case R.id.popup_field_chooser_mail:
+                    }
+                    case R.id.popup_field_chooser_mail: {
                         fields.add(new Field(this, System.currentTimeMillis(),
                             getString(R.string.field_mail), "M", Type.MAIL));
                         break;
-                    case R.id.popup_field_chooser_phone:
+                    }
+                    case R.id.popup_field_chooser_phone: {
                         fields.add(new Field(this, System.currentTimeMillis(),
                             getString(R.string.field_phone), "Ph", Type.PHONE));
                         break;
-                    case R.id.popup_field_chooser_date:
+                    }
+                    case R.id.popup_field_chooser_date: {
                         fields.add(new Field(this, System.currentTimeMillis(),
                             getString(R.string.field_date), "D", Type.DATE));
                         break;
-                    case R.id.popup_field_chooser_pin:
+                    }
+                    case R.id.popup_field_chooser_pin: {
                         fields.add(new Field(this, System.currentTimeMillis(),
                             getString(R.string.field_pin), "PIN", Type.PIN));
                         break;
-                    case R.id.popup_field_chooser_secret:
+                    }
+                    case R.id.popup_field_chooser_secret: {
                         fields.add(new Field(this, System.currentTimeMillis(),
                             getString(R.string.field_secret), "S", Type.SECRET));
                         break;
+                    }
                 }
                 mFieldAdapter.notifyDataSetChanged();
                 return false;
@@ -177,6 +188,7 @@ public class WrapperDetailActivity extends AppCompatActivity {
             sdf.format(new Date(System.currentTimeMillis())));
     }
 
+
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater = getMenuInflater();
@@ -191,7 +203,7 @@ public class WrapperDetailActivity extends AppCompatActivity {
                 mFieldAdapter.setEditable(!mFieldAdapter.isEditable());
 
                 for (int i = 0; i < mFieldAdapter.getItemCount(); i++) {
-                // update each item itself
+                    // update each item itself
                     mFieldAdapter.notifyItemChanged(i, fields.get(i));
                     mFieldAdapter.changeEditTextBehaviour(mLayoutManager.getChildAt(i));
                 }
