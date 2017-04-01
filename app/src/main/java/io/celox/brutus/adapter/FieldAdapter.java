@@ -34,6 +34,7 @@ import com.pepperonas.andbasx.base.ToastUtils;
 import io.celox.brutus.R;
 import io.celox.brutus.Utilities;
 import io.celox.brutus.custom.EditTextDispatched;
+import io.celox.brutus.dialogs.DialogPasswordGenerator;
 import io.celox.brutus.model.Field;
 import io.celox.brutus.model.Field.Type;
 import java.net.MalformedURLException;
@@ -304,15 +305,7 @@ public class FieldAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
         FieldViewHolderPassword(View view) {
             super(view);
 
-            getValue().setSingleLine(true);
-            showPasswordField(getValue());
-            getActionLeft().setImageDrawable(getIcon(R.drawable.cube_outline));
-
-            ensureToggleVisibility(getValue(), getActionLeft());
-
-            ensureShowGenerator(getValue(), getActionLeft());
         }
-
     }
 
     /**
@@ -327,7 +320,6 @@ public class FieldAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
          */
         FieldViewHolderOtp(View view) {
             super(view);
-
             if (!mAnimating) {
                 mTimer.schedule(mAnimationTask, 0, OTP_TIMER_PERIOD);
             }
@@ -410,8 +402,6 @@ public class FieldAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
         FieldViewHolderPin(View view) {
             super(view);
             getValue().setInputType(InputType.TYPE_NUMBER_VARIATION_PASSWORD);
-            getActionLeft().setImageDrawable(getIcon(R.drawable.close));
-            ensureToggleVisibility(getValue(), getActionLeft());
         }
     }
 
@@ -428,12 +418,7 @@ public class FieldAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
         FieldViewHolderSecret(View view) {
             super(view);
             getValue().setInputType(InputType.TYPE_CLASS_TEXT);
-            getActionLeft().setImageDrawable(getIcon(R.drawable.close));
-
-            getActionRight().setOnClickListener(v -> removeField(this));
-            ensureToggleVisibility(getValue(), getActionLeft());
         }
-
     }
 
     @Override
@@ -521,6 +506,9 @@ public class FieldAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
                 vhLogin.getActionRight().setVisibility(mEditable ? View.VISIBLE : View.GONE);
 
                 vhLogin.getActionLeft().setImageDrawable(getIcon(R.drawable.account));
+                vhLogin.getActionLeft().setOnClickListener(v -> {
+                    ToastUtils.toastLong("contacts...");
+                });
 
                 vhLogin.getActionRight().setOnClickListener(v -> {
                     vhLogin.getValue().setText("");
@@ -541,7 +529,9 @@ public class FieldAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
                     vhPassword.getActionLeft().setImageDrawable(getIcon(R.drawable.cube_outline));
                     showPasswordField(vhPassword.getValue());
 
-                    ensureShowGenerator(vhPassword.getValue(), vhPassword.getActionLeft());
+                    vhPassword.getActionLeft().setOnClickListener(v -> {
+                        showDialogPasswordGenerator(vhPassword.getValue());
+                    });
 
                     vhPassword.getActionRight().setOnClickListener(v -> {
                         vhPassword.getValue().setText("");
@@ -816,12 +806,11 @@ public class FieldAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
             | InputType.TYPE_NUMBER_FLAG_SIGNED);
     }
 
-    private void ensureShowGenerator(EditTextDispatched etd, ImageView leftBtn) {
+    private void showDialogPasswordGenerator(EditTextDispatched etd) {
         if (!mEditable) {
             return;
         }
-
-        leftBtn.setOnClickListener(v -> ToastUtils.toastShort("TODO: implement gen!"));
+        new DialogPasswordGenerator(mActivity, etd);
     }
 
     private void removeField(FieldViewHolderBase viewHolderBase) {

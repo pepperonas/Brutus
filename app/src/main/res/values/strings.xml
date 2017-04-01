@@ -141,4 +141,6 @@
 
   <string name="pref_title_vibrate">Vibrate</string>
   <string name="password_debug">mm</string>
+  <string name="gen">gen</string>
+  <string name="dialog_title_password_generator">Generator</string>
 </resources>
