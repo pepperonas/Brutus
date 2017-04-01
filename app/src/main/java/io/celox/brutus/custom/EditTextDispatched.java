@@ -32,7 +32,7 @@ public class EditTextDispatched extends android.support.v7.widget.AppCompatEditT
     private boolean editable = true;
 
     private boolean hidden = true;
-    private String clearText = "";
+//    private String clearText = "";
 
 
     public EditTextDispatched(Context context) {
@@ -59,9 +59,9 @@ public class EditTextDispatched extends android.support.v7.widget.AppCompatEditT
 
     public void setHidden(boolean hidden) { this.hidden = hidden; }
 
-    public String getClearText() { return clearText; }
+//    public String getClearText() { return clearText; }
 
-    public void setClearText(String clearText) { this.clearText = clearText; }
+//    public void setClearText(String clearText) { this.clearText = clearText; }
 
 
     @Override

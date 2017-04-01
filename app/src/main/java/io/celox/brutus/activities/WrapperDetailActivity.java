@@ -25,7 +25,6 @@ import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.PopupMenu;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -39,6 +38,7 @@ import com.pepperonas.andbasx.concurrency.LoaderTaskUtils.Builder;
 import com.pepperonas.andbasx.interfaces.LoaderTaskListener;
 import io.celox.brutus.R;
 import io.celox.brutus.adapter.FieldAdapter;
+import io.celox.brutus.custom.EditTextDispatched;
 import io.celox.brutus.model.Field;
 import io.celox.brutus.model.Field.Type;
 import java.io.InputStream;
@@ -63,41 +63,25 @@ public class WrapperDetailActivity extends AppCompatActivity {
     private LinearLayoutManager mLayoutManager;
     private RecyclerView mRecyclerView;
     private ImageView mIcon;
+    private EditTextDispatched mEtTitle;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_wrapper_detail);
 
-        TextView tvTitle = (TextView) findViewById(R.id.tv_title);
-        tvTitle.setText(getString(R.string.sample_title));
+        mEtTitle = (EditTextDispatched) findViewById(R.id.et_title);
+        mEtTitle.clearFocus();
 
         mTvModified = (TextView) findViewById(R.id.tv_modified);
 
         String modified = makeInfoModified();
         mTvModified.setText(modified);
 
-        mIcon = (ImageView) findViewById(R.id.iv_icon);
-        mIcon.setOnClickListener(view -> {
-            PopupMenu mp = new PopupMenu(WrapperDetailActivity.this, mIcon);
-            mp.inflate(R.menu.popup_icon_chooser);
-            mp.show();
-            mp.setOnMenuItemClickListener(item -> {
-                int id = item.getItemId();
-                switch (id) {
-                    case R.id.popup_icon_chooser_web:
-                        fetchWebIcon(mIcon, "https://celox.io");
-                        break;
-                }
-                return false;
-            });
-        });
-
         mBtnAddField = (Button) findViewById(R.id.btn_add_field);
         mBtnAddField.setVisibility(View.GONE);
         mBtnAddField.setOnClickListener(view -> {
-            PopupMenu mp = new PopupMenu(WrapperDetailActivity.this,
-                mBtnAddField);
+            PopupMenu mp = new PopupMenu(WrapperDetailActivity.this, mBtnAddField);
             mp.inflate(R.menu.popup_field_chooser);
             mp.show();
             mp.setOnMenuItemClickListener(item -> {
@@ -173,7 +157,33 @@ public class WrapperDetailActivity extends AppCompatActivity {
         mRecyclerView.setAdapter(mFieldAdapter);
 
         mFieldAdapter.notifyDataSetChanged();
+
+        mIcon = (ImageView) findViewById(R.id.iv_icon);
+        mIcon.setOnClickListener(view -> {
+            PopupMenu mp = new PopupMenu(WrapperDetailActivity.this, mIcon);
+            mp.inflate(R.menu.popup_icon_chooser);
+
+            for (int i = 0; i < mLayoutManager.getItemCount(); i++) {
+                if (mRecyclerView.getAdapter().getItemViewType(i) == Type.URL.ordinal()) {
+                    mp.getMenu().findItem(R.id.popup_icon_chooser_web)
+                        .setEnabled(mFieldAdapter.getRecentUrl() != null);
+                }
+            }
+
+            mp.show();
+            mp.setOnMenuItemClickListener(item -> {
+                int id = item.getItemId();
+                switch (id) {
+                    case R.id.popup_icon_chooser_web: {
+                        fetchWebIcon(mIcon, mFieldAdapter.getRecentUrl());
+                        break;
+                    }
+                }
+                return false;
+            });
+        });
     }
+
 
     @NonNull
     private String makeInfoModified() {
@@ -199,8 +209,9 @@ public class WrapperDetailActivity extends AppCompatActivity {
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
-            case R.id.action_edit:
+            case R.id.action_edit: {
                 mFieldAdapter.setEditable(!mFieldAdapter.isEditable());
+                mEtTitle.clearFocus();
 
                 for (int i = 0; i < mFieldAdapter.getItemCount(); i++) {
                     // update each item itself
@@ -212,6 +223,7 @@ public class WrapperDetailActivity extends AppCompatActivity {
 
                 stayAtBottom();
                 break;
+            }
         }
         return super.onOptionsItemSelected(item);
     }
@@ -232,7 +244,6 @@ public class WrapperDetailActivity extends AppCompatActivity {
         new Builder(this, new LoaderTaskListener() {
             @Override
             public void onLoaderTaskSuccess(Action action, String msg) {
-                Log.i(TAG, "onLoaderTaskSuccess: " + msg);
                 downloadIconImage(siteUrl, msg);
             }
 
@@ -244,7 +255,7 @@ public class WrapperDetailActivity extends AppCompatActivity {
 
             @Override
             public void onLoaderTaskFailed(Action action, InputStream inputStream) { }
-        }, "https://celox.io")
+        }, mFieldAdapter.getRecentUrl())
             .showProgressDialog(getString(R.string.dialog_title_loading),
                 getString(R.string.dialog_msg_loading))
             .launch();

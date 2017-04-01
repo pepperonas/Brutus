@@ -17,12 +17,13 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
   <item
     android:id="@+id/popup_icon_chooser_web"
+    android:enabled="false"
     android:title="@string/popup_icon_chooser_web"
     android:titleCondensed="@string/popup_icon_chooser_web_condensed"
-    android:visible="true" />
+    android:visible="true"/>
   <item
     android:id="@+id/popup_icon_chooser_gallery"
     android:title="@string/popup_icon_chooser_gallery"
     android:titleCondensed="@string/popup_icon_chooser_gallery_condensed"
-    android:visible="true" />
+    android:visible="true"/>
 </menu>

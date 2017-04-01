@@ -18,10 +18,9 @@
   xmlns:app="http://schemas.android.com/apk/res-auto"
   android:layout_width="match_parent"
   android:layout_height="@dimen/list_item_height"
-  android:paddingTop="10dp"
-  android:paddingBottom="10dp"
+  android:paddingTop="4dp"
+  android:paddingBottom="4dp"
   android:paddingLeft="16dp"
-  android:paddingRight="16dp"
   android:background="?android:attr/selectableItemBackground"
   android:clickable="true"
   android:focusable="true"
@@ -34,7 +33,7 @@
     android:layout_alignParentLeft="true"
     android:layout_alignParentStart="true"
     android:layout_alignParentTop="true"
-    app:srcCompat="@drawable/ic_menu_camera"/>
+    app:srcCompat="@drawable/security"/>
 
   <TextView
     android:id="@+id/row_wrapper_title"
@@ -61,13 +60,17 @@
     android:paddingBottom="4dp"
     android:paddingLeft="8dp"
     android:text="@string/sample_preview"/>
-  <ImageView
+
+  <ImageButton
     android:id="@+id/row_wrapper_star"
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
     android:layout_alignParentEnd="true"
     android:layout_alignParentRight="true"
     android:layout_centerVertical="true"
+    android:layout_marginRight="32dp"
+    android:layout_marginEnd="32dp"
+    android:background="?android:attr/selectableItemBackground"
     app:srcCompat="@drawable/star"/>
 
 </RelativeLayout>

@@ -16,7 +16,10 @@
 
 package io.celox.brutus;
 
+import android.graphics.Rect;
 import android.support.annotation.NonNull;
+import android.view.TouchDelegate;
+import android.view.View;
 import io.celox.brutus.crypto.TotpManager;
 import java.math.BigInteger;
 import org.apache.commons.codec.binary.Base32;
@@ -53,6 +56,12 @@ public class Utilities {
     }
 
 
+    /**
+     * Generate one time password string.
+     *
+     * @param privateKey the private key
+     * @return the string
+     */
     public static String generateOneTimePassword(@NonNull String privateKey) {
         try {
             byte[] decodedKey = Utilities.fromBase32(privateKey);
@@ -65,5 +74,22 @@ public class Utilities {
             return null;
         }
     }
+
+    /**
+     * Expand touch area.
+     *
+     * @param view the view
+     */
+    public static void expandTouchArea(View view) {
+        final View parent = (View) view.getParent();
+        parent.post(() -> {
+            final Rect r = new Rect();
+            view.getHitRect(r);
+            r.top -= 8;
+            r.bottom += 8;
+            parent.setTouchDelegate(new TouchDelegate(r, view));
+        });
+    }
+
 
 }

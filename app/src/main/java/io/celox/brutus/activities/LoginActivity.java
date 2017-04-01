@@ -71,8 +71,8 @@ public class LoginActivity extends AppCompatActivity {
         mEtEnterPassword = (EditText) findViewById(R.id.et_enter_password);
         mEtEnterPasswordAgain = (EditText) findViewById(R.id.et_enter_password_again);
 
-        mEtEnterPassword.setText("mm");
-        mEtEnterPasswordAgain.setText("mm");
+        mEtEnterPassword.setText(R.string.password_debug);
+        mEtEnterPasswordAgain.setText(R.string.password_debug);
 
         Button btnSetPassword = (Button) findViewById(R.id.btn_set_password);
         btnSetPassword.setOnClickListener(new OnClickListener() {
@@ -165,9 +165,8 @@ public class LoginActivity extends AppCompatActivity {
 
     @SuppressWarnings("unchecked")
     public void loadPreferences() {
-    SharedPreferences preferences = getPreferences(MODE_PRIVATE);
+        SharedPreferences preferences = getPreferences(MODE_PRIVATE);
         Map<String, ?> prefs = preferences.getAll();
-//        Map<String, ?> prefs = PreferenceManager.getDefaultSharedPreferences(this).getAll();
         for (String key : prefs.keySet()) {
             Object pref = prefs.get(key);
             String printVal = "";
@@ -193,7 +192,6 @@ public class LoginActivity extends AppCompatActivity {
             Log.d(TAG, "loadPreferences: " + printVal);
         }
     }
-
 
 
     private void scan() {

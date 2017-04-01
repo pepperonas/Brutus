@@ -22,6 +22,7 @@ import android.os.Handler;
 import android.support.annotation.DrawableRes;
 import android.support.v7.widget.RecyclerView;
 import android.text.InputType;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -35,6 +36,8 @@ import io.celox.brutus.Utilities;
 import io.celox.brutus.custom.EditTextDispatched;
 import io.celox.brutus.model.Field;
 import io.celox.brutus.model.Field.Type;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
@@ -52,7 +55,7 @@ public class FieldAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
 
     private static final String TAG = "FieldAdapter";
 
-    public static final int OTP_TIMER_PERIOD = 999;
+    private static final int OTP_TIMER_PERIOD = 999;
 
     // animating OPT validity
     private List<ProgressBar> mProgressBarList = new ArrayList<>();
@@ -69,15 +72,23 @@ public class FieldAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
         public void run() {
             mHandler.post(() -> {
                 mAnimating = true;
+                boolean switched = false;
 
                 mCalendar.setTime(new Date(System.currentTimeMillis()));
 
                 if (mProgressCounter >= 300) {
                     mCountForward = false;
+                    switched = true;
                 }
                 if (mProgressCounter <= 0) {
                     mCountForward = true;
+                    switched = true;
                 }
+
+                if (switched) {
+                    OtpUpdate otpUpdate = new OtpUpdate(vhOtps, otpKeys);
+                }
+
                 if (mCountForward) {
                     mProgressCounter += 10;
                 } else {
@@ -96,6 +107,10 @@ public class FieldAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
     private boolean mEditable = false;
     private Activity mActivity;
     private List<Field> mFields = new ArrayList<>();
+    private ArrayList<FieldViewHolderOtp> vhOtps = new ArrayList<>();
+    private ArrayList<String> otpKeys = new ArrayList<>();
+    private String mFirstUrl = null;
+    private String url = "";
 
 
     /**
@@ -114,6 +129,11 @@ public class FieldAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
         this.mEditable = editable;
     }
 
+    /**
+     * Change edit text behaviour.
+     *
+     * @param base the base
+     */
     public void changeEditTextBehaviour(View base) {
         try {
             EditTextDispatched etd = (EditTextDispatched) base.findViewById(R.id.row_field_value);
@@ -295,7 +315,6 @@ public class FieldAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
 
     }
 
-
     /**
      * The type Field view holder otp.
      */
@@ -471,7 +490,10 @@ public class FieldAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
                 vhText.getActionLeft().setVisibility(View.GONE);
                 vhText.getActionRight().setVisibility(mEditable ? View.VISIBLE : View.GONE);
 
-                vhText.getActionRight().setOnClickListener(v -> removeField(vhText));
+                vhText.getActionRight().setOnClickListener(v -> {
+                    vhText.getValue().setText("");
+                    removeField(vhText);
+                });
                 break;
             }
 
@@ -483,7 +505,10 @@ public class FieldAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
                 vhNumber.getActionLeft().setVisibility(View.GONE);
                 vhNumber.getActionRight().setVisibility(mEditable ? View.VISIBLE : View.GONE);
 
-                vhNumber.getActionRight().setOnClickListener(v -> removeField(vhNumber));
+                vhNumber.getActionRight().setOnClickListener(v -> {
+                    vhNumber.getValue().setText("");
+                    removeField(vhNumber);
+                });
                 break;
             }
 
@@ -497,7 +522,10 @@ public class FieldAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
 
                 vhLogin.getActionLeft().setImageDrawable(getIcon(R.drawable.account));
 
-                vhLogin.getActionRight().setOnClickListener(v -> removeField(vhLogin));
+                vhLogin.getActionRight().setOnClickListener(v -> {
+                    vhLogin.getValue().setText("");
+                    removeField(vhLogin);
+                });
 
                 break;
             }
@@ -515,7 +543,10 @@ public class FieldAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
 
                     ensureShowGenerator(vhPassword.getValue(), vhPassword.getActionLeft());
 
-                    vhPassword.getActionRight().setOnClickListener(v -> removeField(vhPassword));
+                    vhPassword.getActionRight().setOnClickListener(v -> {
+                        vhPassword.getValue().setText("");
+                        removeField(vhPassword);
+                    });
                 } else {
                     hidePasswordField(vhPassword.getValue());
                     vhPassword.getActionLeft().setImageDrawable(
@@ -539,7 +570,12 @@ public class FieldAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
 
                 vhOtp.getActionLeft().setImageDrawable(getIcon(R.drawable.qrcode_scan));
 
-                vhOtp.getActionRight().setOnClickListener(v -> removeField(vhOtp));
+                vhOtp.getActionRight().setOnClickListener(v -> {
+                    vhOtp.getValue().setText("");
+                    otpKeys.remove(vhOtp.getValue().getText().toString());
+                    vhOtps.remove(vhOtp);
+                    removeField(vhOtp);
+                });
 
                 progressBar.setVisibility(mEditable ? View.INVISIBLE : View.VISIBLE);
 
@@ -548,6 +584,8 @@ public class FieldAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
                 // TODO 2017-04-01 00-37: remove otpKey
                 String otpKey = "RZD5U2VM7UKCKTNVQ4KZ75X5LR34RM5I";
                 vhOtp.getValue().setText(Utilities.generateOneTimePassword(otpKey));
+                vhOtps.add(vhOtp);
+                otpKeys.add(otpKey);
                 break;
             }
 
@@ -561,10 +599,26 @@ public class FieldAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
 
                 if (mEditable) {
                     vhUrl.getActionRight().setImageDrawable(getIcon(R.drawable.close));
-                    vhUrl.getActionRight().setOnClickListener(v -> removeField(vhUrl));
+                    vhUrl.getActionRight().setOnClickListener(v -> {
+                        vhUrl.getValue().setText("");
+                        removeField(vhUrl);
+                    });
                 } else {
                     vhUrl.getActionRight().setImageDrawable(getIcon(R.drawable.earth));
+                    vhUrl.getActionRight().setOnClickListener(v -> openUrl(vhUrl.getValue()));
                 }
+
+                vhUrl.getValue().setOnFocusChangeListener((v, hasFocus) -> {
+                    if (hasFocus) {
+                        url = "";
+                    } else {
+                        if (url != null && !url.isEmpty()) {
+                            url = vhUrl.getValue().getText().toString()
+                                .replace(" ", "").toLowerCase();
+                        }
+                    }
+                });
+
                 break;
             }
 
@@ -578,10 +632,14 @@ public class FieldAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
 
                 if (mEditable) {
                     vhMail.getActionRight().setImageDrawable(getIcon(R.drawable.close));
-                    vhMail.getActionRight().setOnClickListener(v -> removeField(vhMail));
+                    vhMail.getActionRight().setOnClickListener(v -> {
+                        vhMail.getValue().setText("");
+                        removeField(vhMail);
+                    });
                 } else {
                     vhMail.getActionRight()
                         .setImageDrawable(getIcon(R.drawable.message_text_outline));
+                    vhMail.getActionRight().setOnClickListener(v -> sendMail(vhMail.getValue()));
                 }
                 break;
             }
@@ -596,9 +654,13 @@ public class FieldAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
 
                 if (mEditable) {
                     vhPhone.getActionRight().setImageDrawable(getIcon(R.drawable.close));
-                    vhPhone.getActionRight().setOnClickListener(v -> removeField(vhPhone));
+                    vhPhone.getActionRight().setOnClickListener(v -> {
+                        vhPhone.getValue().setText("");
+                        removeField(vhPhone);
+                    });
                 } else {
                     vhPhone.getActionRight().setImageDrawable(getIcon(R.drawable.phone));
+                    vhPhone.getActionRight().setOnClickListener(v -> phoneCall(vhPhone.getValue()));
                 }
                 break;
             }
@@ -611,7 +673,10 @@ public class FieldAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
                 vhDate.getActionLeft().setVisibility(View.GONE);
                 vhDate.getActionRight().setVisibility(mEditable ? View.VISIBLE : View.GONE);
 
-                vhDate.getActionRight().setOnClickListener(v -> removeField(vhDate));
+                vhDate.getActionRight().setOnClickListener(v -> {
+                    vhDate.getValue().setText("");
+                    removeField(vhDate);
+                });
                 break;
             }
 
@@ -623,7 +688,10 @@ public class FieldAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
                 vhPin.getActionLeft().setVisibility(mEditable ? View.GONE : View.VISIBLE);
                 vhPin.getActionRight().setVisibility(mEditable ? View.VISIBLE : View.GONE);
 
-                vhPin.getActionRight().setOnClickListener(v -> removeField(vhPin));
+                vhPin.getActionRight().setOnClickListener(v -> {
+                    vhPin.getValue().setText("");
+                    removeField(vhPin);
+                });
 
                 if (mEditable) {
                     vhPin.getActionLeft().setImageDrawable(getIcon(R.drawable.close));
@@ -653,7 +721,10 @@ public class FieldAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
                 if (mEditable) {
                     vhSecret.getActionLeft().setImageDrawable(getIcon(R.drawable.close));
                     showPasswordField(vhSecret.getValue());
-                    vhSecret.getActionRight().setOnClickListener(v -> removeField(vhSecret));
+                    vhSecret.getActionRight().setOnClickListener(v -> {
+                        vhSecret.getValue().setText("");
+                        removeField(vhSecret);
+                    });
                 } else {
                     hidePasswordField(vhSecret.getValue());
                     vhSecret.getActionLeft()
@@ -666,6 +737,18 @@ public class FieldAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
             }
             break;
         }
+    }
+
+    private void openUrl(EditTextDispatched value) {
+        ToastUtils.toastShort("openUrl");
+    }
+
+    private void phoneCall(EditTextDispatched value) {
+        ToastUtils.toastShort("call");
+    }
+
+    private void sendMail(EditTextDispatched value) {
+        ToastUtils.toastShort("mail");
     }
 
     private void ensureToggleVisibility(EditTextDispatched etd, ImageView leftBtn) {
@@ -751,6 +834,11 @@ public class FieldAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
     }
 
     @Override
+    public long getItemId(int position) {
+        return super.getItemId(position);
+    }
+
+    @Override
     public int getItemViewType(int position) {
         return mFields.get(position).getType().ordinal();
     }
@@ -758,6 +846,37 @@ public class FieldAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
     @Override
     public int getItemCount() {
         return mFields.size();
+    }
+
+    public String getRecentUrl() {
+        if (url == null && !url.isEmpty()) {
+            Log.w(TAG, "no url!");
+            return null;
+        }
+        try {
+            new URL(url);
+            Log.i(TAG, "good url: " + url);
+            return url;
+        } catch (MalformedURLException e) {
+            e.printStackTrace();
+        }
+        Log.e(TAG, "bad url: " + url);
+        return null;
+    }
+
+
+    private class OtpUpdate {
+
+        OtpUpdate(ArrayList<FieldViewHolderOtp> vhOtps, ArrayList<String> otpKeys) {
+            for (int i = 0; i < vhOtps.size(); i++) {
+                try {
+                    vhOtps.get(i).getValue()
+                        .setText(Utilities.generateOneTimePassword(otpKeys.get(i)));
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+        }
     }
 
 }
