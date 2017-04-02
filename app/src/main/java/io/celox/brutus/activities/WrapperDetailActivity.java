@@ -212,6 +212,7 @@ public class WrapperDetailActivity extends AppCompatActivity {
             case R.id.action_edit: {
                 mFieldAdapter.setEditable(!mFieldAdapter.isEditable());
                 mEtTitle.clearFocus();
+                mEtTitle.setEditable(mFieldAdapter.isEditable());
 
                 for (int i = 0; i < mFieldAdapter.getItemCount(); i++) {
                     // update each item itself

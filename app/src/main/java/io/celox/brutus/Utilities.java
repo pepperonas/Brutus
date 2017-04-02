@@ -16,10 +16,12 @@
 
 package io.celox.brutus;
 
+import android.content.Context;
 import android.graphics.Rect;
 import android.support.annotation.NonNull;
 import android.view.TouchDelegate;
 import android.view.View;
+import android.view.inputmethod.InputMethodManager;
 import io.celox.brutus.crypto.TotpManager;
 import java.math.BigInteger;
 import org.apache.commons.codec.binary.Base32;
@@ -91,5 +93,12 @@ public class Utilities {
         });
     }
 
+    public static void hideKeyboard(View view, Context ctx) {
+        if (view != null) {
+            InputMethodManager imm =
+                (InputMethodManager) ctx.getSystemService(Context.INPUT_METHOD_SERVICE);
+            imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
+        }
+    }
 
 }

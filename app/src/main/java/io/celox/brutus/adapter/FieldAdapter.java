@@ -87,7 +87,7 @@ public class FieldAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
                 }
 
                 if (switched) {
-                    OtpUpdate otpUpdate = new OtpUpdate(vhOtps, otpKeys);
+                    new OtpUpdate(vhOtps, otpKeys);
                 }
 
                 if (mCountForward) {
@@ -110,7 +110,6 @@ public class FieldAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
     private List<Field> mFields = new ArrayList<>();
     private ArrayList<FieldViewHolderOtp> vhOtps = new ArrayList<>();
     private ArrayList<String> otpKeys = new ArrayList<>();
-    private String mFirstUrl = null;
     private String url = "";
 
 
@@ -164,7 +163,6 @@ public class FieldAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
         /**
          * The constant DELEGATE_SIZE.
          */
-        public static final int DELEGATE_SIZE = 16;
         private TextView description;
         private EditTextDispatched value;
         private ImageView actionLeft;
@@ -184,6 +182,9 @@ public class FieldAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
             actionLeft.setVisibility(View.GONE);
             actionRight.setVisibility(mEditable ? View.VISIBLE : View.INVISIBLE);
             actionRight.setImageDrawable(getIcon(R.drawable.close));
+
+            Utilities.expandTouchArea(actionLeft);
+            Utilities.expandTouchArea(actionRight);
 
             changeEditTextBehaviour(view);
             value.requestFocus();
@@ -424,39 +425,50 @@ public class FieldAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
     @Override
     public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         switch (Type.values()[viewType]) {
-            case TEXT:
+            case TEXT: {
                 return new FieldViewHolderText(LayoutInflater.from(parent.getContext())
                     .inflate(R.layout.row_field, parent, false));
-            case NUMBER:
+            }
+            case NUMBER: {
                 return new FieldViewHolderNumber(LayoutInflater.from(parent.getContext())
                     .inflate(R.layout.row_field, parent, false));
-            case LOGIN:
+            }
+            case LOGIN: {
                 return new FieldViewHolderLogin(LayoutInflater.from(parent.getContext())
                     .inflate(R.layout.row_field, parent, false));
-            case PASSWORD:
+            }
+            case PASSWORD: {
                 return new FieldViewHolderPassword(LayoutInflater.from(parent.getContext())
                     .inflate(R.layout.row_field, parent, false));
-            case OTP:
+            }
+            case OTP: {
                 return new FieldViewHolderOtp(LayoutInflater.from(parent.getContext())
                     .inflate(R.layout.row_field, parent, false));
-            case URL:
+            }
+            case URL: {
                 return new FieldViewHolderUrl(LayoutInflater.from(parent.getContext())
                     .inflate(R.layout.row_field, parent, false));
-            case MAIL:
+            }
+            case MAIL: {
                 return new FieldViewHolderMail(LayoutInflater.from(parent.getContext())
                     .inflate(R.layout.row_field, parent, false));
-            case PHONE:
+            }
+            case PHONE: {
                 return new FieldViewHolderPhone(LayoutInflater.from(parent.getContext())
                     .inflate(R.layout.row_field, parent, false));
-            case DATE:
+            }
+            case DATE: {
                 return new FieldViewHolderDate(LayoutInflater.from(parent.getContext())
                     .inflate(R.layout.row_field, parent, false));
-            case PIN:
+            }
+            case PIN: {
                 return new FieldViewHolderPin(LayoutInflater.from(parent.getContext())
                     .inflate(R.layout.row_field, parent, false));
-            case SECRET:
+            }
+            case SECRET: {
                 return new FieldViewHolderSecret(LayoutInflater.from(parent.getContext())
                     .inflate(R.layout.row_field, parent, false));
+            }
         }
         return null;
     }
@@ -560,12 +572,14 @@ public class FieldAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
 
                 vhOtp.getActionLeft().setImageDrawable(getIcon(R.drawable.qrcode_scan));
 
-                vhOtp.getActionRight().setOnClickListener(v -> {
+                vhOtp.getActionLeft().setOnClickListener(null);
+
+                vhOtp.getActionRight().setOnClickListener(mEditable ? v -> {
                     vhOtp.getValue().setText("");
                     otpKeys.remove(vhOtp.getValue().getText().toString());
                     vhOtps.remove(vhOtp);
                     removeField(vhOtp);
-                });
+                } : null);
 
                 progressBar.setVisibility(mEditable ? View.INVISIBLE : View.VISIBLE);
 

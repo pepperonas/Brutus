@@ -7,7 +7,7 @@
           <extensions>
             <ext name="ext" type="org.gradle.api.internal.plugins.DefaultExtraPropertiesExtension" />
             <task name="projects" type="org.gradle.api.tasks.diagnostics.ProjectReportTask">Displays the sub-projects of root project 'Brutus'.&lt;p&gt;&lt;i&gt;Task group: help&lt;i&gt;</task>
-            <task name="prepareComGithubPepperonasMaterialdialog030Library" type="com.android.build.gradle.internal.tasks.PrepareLibraryTask">Prepare com.github.pepperonas:materialdialog:0.3.0&lt;p&gt;&lt;i&gt;Task group: other&lt;i&gt;</task>
+            <task name="prepareComGithubPepperonasMaterialdialog031Library" type="com.android.build.gradle.internal.tasks.PrepareLibraryTask">Prepare com.github.pepperonas:materialdialog:0.3.1&lt;p&gt;&lt;i&gt;Task group: other&lt;i&gt;</task>
             <task name="transformJackWithJackForRelease" type="com.android.build.gradle.internal.pipeline.TransformTask">&lt;i&gt;Task group: other&lt;i&gt;</task>
             <task name="validateSigningDebugAndroidTest" type="com.android.build.gradle.internal.tasks.ValidateSigningTask">&lt;i&gt;Task group: other&lt;i&gt;</task>
             <task name="prepareComAndroidSupportConstraintConstraintLayout102Library" type="com.android.build.gradle.internal.tasks.PrepareLibraryTask">Prepare com.android.support.constraint:constraint-layout:1.0.2&lt;p&gt;&lt;i&gt;Task group: other&lt;i&gt;</task>
@@ -204,7 +204,7 @@
             <ext name="reporting" type="org.gradle.api.reporting.ReportingExtension" />
             <ext name="android" type="com.android.build.gradle.AppExtension" />
             <prop name="archivesBaseName">brutus</prop>
-            <task name="prepareComGithubPepperonasMaterialdialog030Library" type="com.android.build.gradle.internal.tasks.PrepareLibraryTask">Prepare com.github.pepperonas:materialdialog:0.3.0&lt;p&gt;&lt;i&gt;Task group: other&lt;i&gt;</task>
+            <task name="prepareComGithubPepperonasMaterialdialog031Library" type="com.android.build.gradle.internal.tasks.PrepareLibraryTask">Prepare com.github.pepperonas:materialdialog:0.3.1&lt;p&gt;&lt;i&gt;Task group: other&lt;i&gt;</task>
             <task name="projects" type="org.gradle.api.tasks.diagnostics.ProjectReportTask">Displays the sub-projects of project ':app'.&lt;p&gt;&lt;i&gt;Task group: help&lt;i&gt;</task>
             <task name="transformJackWithJackForRelease" type="com.android.build.gradle.internal.pipeline.TransformTask">&lt;i&gt;Task group: other&lt;i&gt;</task>
             <task name="validateSigningDebugAndroidTest" type="com.android.build.gradle.internal.tasks.ValidateSigningTask">&lt;i&gt;Task group: other&lt;i&gt;</task>
