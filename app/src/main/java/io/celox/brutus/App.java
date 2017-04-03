@@ -17,7 +17,7 @@
 package io.celox.brutus;
 
 import android.app.Application;
-import com.pepperonas.aespreferences.AesPrefs;
+import com.pepperonas.aesprefs.AesPrefs;
 import com.pepperonas.andbasx.AndBasx;
 
 

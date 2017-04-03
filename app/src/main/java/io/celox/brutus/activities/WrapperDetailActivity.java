@@ -81,70 +81,76 @@ public class WrapperDetailActivity extends AppCompatActivity {
         mBtnAddField = (Button) findViewById(R.id.btn_add_field);
         mBtnAddField.setVisibility(View.GONE);
         mBtnAddField.setOnClickListener(view -> {
-            PopupMenu mp = new PopupMenu(WrapperDetailActivity.this, mBtnAddField);
-            mp.inflate(R.menu.popup_field_chooser);
-            mp.show();
-            mp.setOnMenuItemClickListener(item -> {
-                switch (item.getItemId()) {
-                    case R.id.popup_field_chooser_text: {
-                        fields.add(new Field(this, System.currentTimeMillis(),
-                            getString(R.string.field_text), "T", Type.TEXT));
-                        break;
+            {
+                PopupMenu mp = new PopupMenu(WrapperDetailActivity.this, mBtnAddField);
+                mp.inflate(R.menu.popup_field_chooser);
+                mp.show();
+                mp.setOnMenuItemClickListener(item -> {
+                    {
+                        {
+                            switch (item.getItemId()) {
+                                case R.id.popup_field_chooser_text: {
+                                    fields.add(new Field(this, System.currentTimeMillis(),
+                                        getString(R.string.field_text), "T", Type.TEXT));
+                                    break;
+                                }
+                                case R.id.popup_field_chooser_number: {
+                                    fields.add(new Field(this, System.currentTimeMillis(),
+                                        getString(R.string.field_number), "N", Type.NUMBER));
+                                    break;
+                                }
+                                case R.id.popup_field_chooser_login: {
+                                    fields.add(new Field(this, System.currentTimeMillis(),
+                                        getString(R.string.field_login), "L", Type.LOGIN));
+                                    break;
+                                }
+                                case R.id.popup_field_chooser_password: {
+                                    fields.add(new Field(this, System.currentTimeMillis(),
+                                        getString(R.string.field_password), "P", Type.PASSWORD));
+                                    break;
+                                }
+                                case R.id.popup_field_chooser_otp: {
+                                    fields.add(new Field(this, System.currentTimeMillis(),
+                                        getString(R.string.field_otp), "O", Type.OTP));
+                                    break;
+                                }
+                                case R.id.popup_field_chooser_url: {
+                                    fields.add(new Field(this, System.currentTimeMillis(),
+                                        getString(R.string.field_url), "U", Type.URL));
+                                    break;
+                                }
+                                case R.id.popup_field_chooser_mail: {
+                                    fields.add(new Field(this, System.currentTimeMillis(),
+                                        getString(R.string.field_mail), "M", Type.MAIL));
+                                    break;
+                                }
+                                case R.id.popup_field_chooser_phone: {
+                                    fields.add(new Field(this, System.currentTimeMillis(),
+                                        getString(R.string.field_phone), "Ph", Type.PHONE));
+                                    break;
+                                }
+                                case R.id.popup_field_chooser_date: {
+                                    fields.add(new Field(this, System.currentTimeMillis(),
+                                        getString(R.string.field_date), "D", Type.DATE));
+                                    break;
+                                }
+                                case R.id.popup_field_chooser_pin: {
+                                    fields.add(new Field(this, System.currentTimeMillis(),
+                                        getString(R.string.field_pin), "PIN", Type.PIN));
+                                    break;
+                                }
+                                case R.id.popup_field_chooser_secret: {
+                                    fields.add(new Field(this, System.currentTimeMillis(),
+                                        getString(R.string.field_secret), "S", Type.SECRET));
+                                    break;
+                                }
+                            }
+                            mFieldAdapter.notifyDataSetChanged();
+                            return false;
+                        }
                     }
-                    case R.id.popup_field_chooser_number: {
-                        fields.add(new Field(this, System.currentTimeMillis(),
-                            getString(R.string.field_number), "N", Type.NUMBER));
-                        break;
-                    }
-                    case R.id.popup_field_chooser_login: {
-                        fields.add(new Field(this, System.currentTimeMillis(),
-                            getString(R.string.field_login), "L", Type.LOGIN));
-                        break;
-                    }
-                    case R.id.popup_field_chooser_password: {
-                        fields.add(new Field(this, System.currentTimeMillis(),
-                            getString(R.string.field_password), "P", Type.PASSWORD));
-                        break;
-                    }
-                    case R.id.popup_field_chooser_otp: {
-                        fields.add(new Field(this, System.currentTimeMillis(),
-                            getString(R.string.field_otp), "O", Type.OTP));
-                        break;
-                    }
-                    case R.id.popup_field_chooser_url: {
-                        fields.add(new Field(this, System.currentTimeMillis(),
-                            getString(R.string.field_url), "U", Type.URL));
-                        break;
-                    }
-                    case R.id.popup_field_chooser_mail: {
-                        fields.add(new Field(this, System.currentTimeMillis(),
-                            getString(R.string.field_mail), "M", Type.MAIL));
-                        break;
-                    }
-                    case R.id.popup_field_chooser_phone: {
-                        fields.add(new Field(this, System.currentTimeMillis(),
-                            getString(R.string.field_phone), "Ph", Type.PHONE));
-                        break;
-                    }
-                    case R.id.popup_field_chooser_date: {
-                        fields.add(new Field(this, System.currentTimeMillis(),
-                            getString(R.string.field_date), "D", Type.DATE));
-                        break;
-                    }
-                    case R.id.popup_field_chooser_pin: {
-                        fields.add(new Field(this, System.currentTimeMillis(),
-                            getString(R.string.field_pin), "PIN", Type.PIN));
-                        break;
-                    }
-                    case R.id.popup_field_chooser_secret: {
-                        fields.add(new Field(this, System.currentTimeMillis(),
-                            getString(R.string.field_secret), "S", Type.SECRET));
-                        break;
-                    }
-                }
-                mFieldAdapter.notifyDataSetChanged();
-                return false;
-            });
+                });
+            }
         });
 
         mRecyclerView = (RecyclerView) findViewById(R.id.recycler_view);
@@ -184,6 +190,10 @@ public class WrapperDetailActivity extends AppCompatActivity {
         });
     }
 
+    @Override
+    protected void onPause() {
+        super.onPause();
+    }
 
     @NonNull
     private String makeInfoModified() {

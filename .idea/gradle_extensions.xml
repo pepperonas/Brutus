@@ -58,6 +58,7 @@
             <task name="transformResourcesWithMergeJavaResForReleaseUnitTest" type="com.android.build.gradle.internal.pipeline.TransformTask">&lt;i&gt;Task group: other&lt;i&gt;</task>
             <task name="cleanIdeaModule" type="org.gradle.api.tasks.Delete">&lt;i&gt;Task group: other&lt;i&gt;</task>
             <task name="preDebugAndroidTestBuild">&lt;i&gt;Task group: other&lt;i&gt;</task>
+            <task name="prepareComGithubPepperonasAesprefs003Library" type="com.android.build.gradle.internal.tasks.PrepareLibraryTask">Prepare com.github.pepperonas:aesprefs:0.0.3&lt;p&gt;&lt;i&gt;Task group: other&lt;i&gt;</task>
             <task name="processDebugAndroidTestJavaRes" type="org.gradle.api.tasks.Sync">&lt;i&gt;Task group: other&lt;i&gt;</task>
             <task name="prepareComGithubPepperonasAndbasx029Library" type="com.android.build.gradle.internal.tasks.PrepareLibraryTask">Prepare com.github.pepperonas:andbasx:0.2.9&lt;p&gt;&lt;i&gt;Task group: other&lt;i&gt;</task>
             <task name="processReleaseUnitTestJavaRes" type="org.gradle.api.tasks.Sync">&lt;i&gt;Task group: other&lt;i&gt;</task>
@@ -116,7 +117,6 @@
             <task name="androidDependencies" type="com.android.build.gradle.internal.tasks.DependencyReportTask">Displays the Android dependencies of the project.&lt;p&gt;&lt;i&gt;Task group: Android&lt;i&gt;</task>
             <task name="compileDebugAndroidTestNdk" type="com.android.build.gradle.tasks.NdkCompile">&lt;i&gt;Task group: other&lt;i&gt;</task>
             <task name="compileDebugUnitTestSources">&lt;i&gt;Task group: build&lt;i&gt;</task>
-            <task name="prepareComGithubPepperonasAespreferences006Library" type="com.android.build.gradle.internal.tasks.PrepareLibraryTask">Prepare com.github.pepperonas:aespreferences:0.0.6&lt;p&gt;&lt;i&gt;Task group: other&lt;i&gt;</task>
             <task name="transformNativeLibsWithMergeJniLibsForRelease" type="com.android.build.gradle.internal.pipeline.TransformTask">&lt;i&gt;Task group: other&lt;i&gt;</task>
             <task name="generateDebugSources">&lt;i&gt;Task group: other&lt;i&gt;</task>
             <task name="mergeDebugAndroidTestJniLibFolders" type="com.android.build.gradle.tasks.MergeSourceSetFolders">&lt;i&gt;Task group: other&lt;i&gt;</task>
@@ -255,6 +255,7 @@
             <task name="transformResourcesWithMergeJavaResForReleaseUnitTest" type="com.android.build.gradle.internal.pipeline.TransformTask">&lt;i&gt;Task group: other&lt;i&gt;</task>
             <task name="cleanIdeaModule" type="org.gradle.api.tasks.Delete">&lt;i&gt;Task group: other&lt;i&gt;</task>
             <task name="preDebugAndroidTestBuild">&lt;i&gt;Task group: other&lt;i&gt;</task>
+            <task name="prepareComGithubPepperonasAesprefs003Library" type="com.android.build.gradle.internal.tasks.PrepareLibraryTask">Prepare com.github.pepperonas:aesprefs:0.0.3&lt;p&gt;&lt;i&gt;Task group: other&lt;i&gt;</task>
             <task name="processDebugAndroidTestJavaRes" type="org.gradle.api.tasks.Sync">&lt;i&gt;Task group: other&lt;i&gt;</task>
             <task name="prepareComGithubPepperonasAndbasx029Library" type="com.android.build.gradle.internal.tasks.PrepareLibraryTask">Prepare com.github.pepperonas:andbasx:0.2.9&lt;p&gt;&lt;i&gt;Task group: other&lt;i&gt;</task>
             <task name="processReleaseUnitTestJavaRes" type="org.gradle.api.tasks.Sync">&lt;i&gt;Task group: other&lt;i&gt;</task>
@@ -311,7 +312,6 @@
             <task name="androidDependencies" type="com.android.build.gradle.internal.tasks.DependencyReportTask">Displays the Android dependencies of the project.&lt;p&gt;&lt;i&gt;Task group: Android&lt;i&gt;</task>
             <task name="compileDebugAndroidTestNdk" type="com.android.build.gradle.tasks.NdkCompile">&lt;i&gt;Task group: other&lt;i&gt;</task>
             <task name="compileDebugUnitTestSources">&lt;i&gt;Task group: build&lt;i&gt;</task>
-            <task name="prepareComGithubPepperonasAespreferences006Library" type="com.android.build.gradle.internal.tasks.PrepareLibraryTask">Prepare com.github.pepperonas:aespreferences:0.0.6&lt;p&gt;&lt;i&gt;Task group: other&lt;i&gt;</task>
             <task name="transformNativeLibsWithMergeJniLibsForRelease" type="com.android.build.gradle.internal.pipeline.TransformTask">&lt;i&gt;Task group: other&lt;i&gt;</task>
             <task name="generateDebugSources">&lt;i&gt;Task group: other&lt;i&gt;</task>
             <task name="mergeDebugAndroidTestJniLibFolders" type="com.android.build.gradle.tasks.MergeSourceSetFolders">&lt;i&gt;Task group: other&lt;i&gt;</task>

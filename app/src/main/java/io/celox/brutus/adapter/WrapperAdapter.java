@@ -21,7 +21,6 @@ import android.content.Intent;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.ImageButton;
 import android.widget.ImageView;
@@ -75,21 +74,26 @@ public class WrapperAdapter extends RecyclerView.Adapter<WrapperViewHolder> {
         try {
             ImageButton star = holder.star;
             star.setOnClickListener(view -> {
-                wrapper.setStarred(!wrapper.isStarred());
-                star.setImageDrawable(activity.getResources().getDrawable(wrapper.isStarred()
-                    ? R.drawable.star_off : R.drawable.star));
+                {
+                    {
+                        wrapper.setStarred(!wrapper.isStarred());
+                        star.setImageDrawable(
+                            activity.getResources().getDrawable(wrapper.isStarred()
+                                ? R.drawable.star_off : R.drawable.star));
+                    }
+                }
             });
 
             Utilities.expandTouchArea(star);
 
             holder.title.setText(wrapper.getTitle());
             holder.preview.setText(String.valueOf(wrapper.getFields().size()));
-            holder.itemView.setOnClickListener(new OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    activity.startActivity(new Intent(activity, WrapperDetailActivity.class));
-                }
-            });
+            holder.itemView.setOnClickListener(
+                v -> {
+                    {
+                        activity.startActivity(new Intent(activity, WrapperDetailActivity.class));
+                    }
+                });
         } catch (Exception e) {
             e.printStackTrace();
         }

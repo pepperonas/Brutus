@@ -22,6 +22,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -84,7 +85,13 @@ public class LoginActivity extends AppCompatActivity {
 
         mViewSetPassword = findViewById(R.id.set_password_form);
 
-        processEncryption();
+
+        AsyncTask.execute(new Runnable() {
+            @Override
+            public void run() {
+                processEncryption();
+            }
+        });
 
 //        processOneTimePassword("");
 
