@@ -25,6 +25,7 @@ import android.view.ViewGroup;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
+import com.pepperonas.aesprefs.AesPrefs;
 import io.celox.brutus.R;
 import io.celox.brutus.Utilities;
 import io.celox.brutus.activities.WrapperDetailActivity;
@@ -91,7 +92,12 @@ public class WrapperAdapter extends RecyclerView.Adapter<WrapperViewHolder> {
             holder.itemView.setOnClickListener(
                 v -> {
                     {
-                        activity.startActivity(new Intent(activity, WrapperDetailActivity.class));
+
+                        AesPrefs.putLong("lua", System.currentTimeMillis());
+
+                        Intent intent = new Intent(activity, WrapperDetailActivity.class);
+                        intent.putExtra("wrapper", String.valueOf(position));
+                        activity.startActivity(intent);
                     }
                 });
         } catch (Exception e) {

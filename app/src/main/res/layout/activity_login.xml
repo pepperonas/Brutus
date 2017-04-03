@@ -81,6 +81,15 @@
       android:layout_marginTop="16dp"
       android:text="@string/action_set_password"/>
 
+    <Button
+      android:id="@+id/btn_reset"
+      style="?android:textAppearanceSmall"
+      android:textStyle="bold"
+      android:layout_width="match_parent"
+      android:layout_height="wrap_content"
+      android:layout_marginTop="16dp"
+      android:text="reset"/>
+
   </LinearLayout>
 
 </LinearLayout>

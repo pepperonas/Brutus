@@ -33,11 +33,14 @@ import android.preference.RingtonePreference;
 import android.support.v7.app.ActionBar;
 import android.text.TextUtils;
 import android.view.MenuItem;
+import com.pepperonas.aesprefs.AesPrefs;
+import com.pepperonas.andbasx.base.ToastUtils;
 import io.celox.brutus.R;
 import java.util.List;
 
-public class SettingsActivity extends AppCompatPreferenceActivity {
+public class SettingsActivity extends SecuredAppCompatPreferenceActivity {
 
+    private String mPanel = "general";
 
     private static Preference.OnPreferenceChangeListener sBindPreferenceSummaryToValueListener = new Preference.OnPreferenceChangeListener() {
         @Override
@@ -87,6 +90,7 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
         }
     };
 
+
     /**
      * Helper method to determine if the device has an extra-large screen. For
      * example, 10" tablets are extra-large.
@@ -121,6 +125,14 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setupActionBar();
+
+        ToastUtils.toastShort("last: " + getIntent().getStringExtra("panel"));
+    }
+
+    @Override
+    public void onBackPressed() {
+        AesPrefs.putLong("lua", System.currentTimeMillis());
+        super.onBackPressed();
     }
 
     /**
@@ -157,6 +169,7 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
             || DataSyncPreferenceFragment.class.getName().equals(fragmentName)
             || NotificationPreferenceFragment.class.getName().equals(fragmentName);
     }
+
 
     /**
      * This fragment shows general preferences only. It is used when the
@@ -250,5 +263,9 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
             }
             return super.onOptionsItemSelected(item);
         }
+    }
+
+    public String getPanel() {
+        return mPanel;
     }
 }

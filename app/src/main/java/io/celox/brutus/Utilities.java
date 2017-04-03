@@ -36,6 +36,7 @@ public class Utilities {
 
     private static final String TAG = "Utilities";
 
+
     /**
      * To hex string.
      *

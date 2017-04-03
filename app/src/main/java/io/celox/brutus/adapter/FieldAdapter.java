@@ -72,36 +72,37 @@ public class FieldAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
     private TimerTask mAnimationTask = new TimerTask() {
         public void run() {
             mHandler.post(() -> {
-                mAnimating = true;
-                boolean switched = false;
+                {
+                    mAnimating = true;
+                    boolean switched = false;
 
-                mCalendar.setTime(new Date(System.currentTimeMillis()));
+                    mCalendar.setTime(new Date(System.currentTimeMillis()));
 
-                if (mProgressCounter >= 300) {
-                    mCountForward = false;
-                    switched = true;
-                }
-                if (mProgressCounter <= 0) {
-                    mCountForward = true;
-                    switched = true;
-                }
-
-                if (switched) {
-                    new OtpUpdate(vhOtps, otpKeys);
-                }
-
-                if (mCountForward) {
-                    mProgressCounter += 10;
-                } else {
-                    mProgressCounter -= 10;
-                }
-
-                for (ProgressBar pb : mProgressBarList) {
-                    if (pb != null) {
-                        pb.setProgress(mProgressCounter);
+                    if (mProgressCounter >= 300) {
+                        mCountForward = false;
+                        switched = true;
                     }
-                }
-            });
+                    if (mProgressCounter <= 0) {
+                        mCountForward = true;
+                        switched = true;
+                    }
+
+                    if (switched) {
+                        new OtpUpdate(vhOtps, otpKeys);
+                    }
+
+                    if (mCountForward) {
+                        mProgressCounter += 10;
+                    } else {
+                        mProgressCounter -= 10;
+                    }
+
+                    for (ProgressBar pb : mProgressBarList) {
+                        if (pb != null) {
+                            pb.setProgress(mProgressCounter);
+                        }
+                    }
+                }});
         }
     };
 
@@ -616,9 +617,11 @@ public class FieldAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
                     if (hasFocus) {
                         url = "";
                     } else {
-                        if (url != null && !url.isEmpty()) {
+                        try {
                             url = vhUrl.getValue().getText().toString()
                                 .replace(" ", "").toLowerCase();
+                        } catch (Exception e) {
+                            Log.e(TAG, "onBindViewHolder: Error while getting url.");
                         }
                     }
                 });
@@ -852,7 +855,7 @@ public class FieldAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
     }
 
     public String getRecentUrl() {
-        if (url == null && !url.isEmpty()) {
+        if (url == null || url.isEmpty()) {
             Log.w(TAG, "no url!");
             return null;
         }

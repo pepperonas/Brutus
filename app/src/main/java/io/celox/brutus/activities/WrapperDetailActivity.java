@@ -20,7 +20,6 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
-import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.PopupMenu;
@@ -32,6 +31,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
+import com.pepperonas.aesprefs.AesPrefs;
 import com.pepperonas.andbasx.concurrency.LoaderTaskUtils;
 import com.pepperonas.andbasx.concurrency.LoaderTaskUtils.Action;
 import com.pepperonas.andbasx.concurrency.LoaderTaskUtils.Builder;
@@ -51,7 +51,7 @@ import java.util.Locale;
 /**
  * The type Wrapper detail activity.
  */
-public class WrapperDetailActivity extends AppCompatActivity {
+public class WrapperDetailActivity extends SecuredAppCompatActivity {
 
     private static final String TAG = "WrapperDetailActivity";
 
@@ -64,13 +64,19 @@ public class WrapperDetailActivity extends AppCompatActivity {
     private RecyclerView mRecyclerView;
     private ImageView mIcon;
     private EditTextDispatched mEtTitle;
+    private String mWrapper;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_wrapper_detail);
 
+        String title = "Wrapper ";
+        mWrapper = getIntent().getStringExtra("wrapper");
+        title += mWrapper;
+
         mEtTitle = (EditTextDispatched) findViewById(R.id.et_title);
+        mEtTitle.setText(title);
         mEtTitle.clearFocus();
 
         mTvModified = (TextView) findViewById(R.id.tv_modified);
@@ -178,31 +184,29 @@ public class WrapperDetailActivity extends AppCompatActivity {
 
             mp.show();
             mp.setOnMenuItemClickListener(item -> {
-                int id = item.getItemId();
-                switch (id) {
-                    case R.id.popup_icon_chooser_web: {
-                        fetchWebIcon(mIcon, mFieldAdapter.getRecentUrl());
-                        break;
+                {
+                    int id = item.getItemId();
+                    switch (id) {
+                        case R.id.popup_icon_chooser_web: {
+                            fetchWebIcon(mIcon, mFieldAdapter.getRecentUrl());
+                            break;
+                        }
                     }
+                    return false;
                 }
-                return false;
             });
         });
     }
 
-    @Override
-    protected void onPause() {
-        super.onPause();
-    }
 
     @NonNull
     private String makeInfoModified() {
         Locale locale = this.getResources().getConfiguration().locale;
         SimpleDateFormat sdf;
         if (locale == Locale.GERMAN) {
-            sdf = new SimpleDateFormat("EEEE dd/MM.yyyy HH:mm", locale);
+            sdf = new SimpleDateFormat("dd/MM.yyyy HH:mm", locale);
         } else {
-            sdf = new SimpleDateFormat("EEEE MM/dd/yyyy HH:mm", locale);
+            sdf = new SimpleDateFormat("MM/dd/yyyy HH:mm", locale);
         }
         return String.format("%s %s", getString(R.string.modified),
             sdf.format(new Date(System.currentTimeMillis())));
@@ -239,6 +243,11 @@ public class WrapperDetailActivity extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
 
+    @Override
+    public void onBackPressed() {
+        AesPrefs.putLong("lua", System.currentTimeMillis());
+        super.onBackPressed();
+    }
 
     /**
      * Ensure {@link RecyclerView} stays on bottom when switching mode.
@@ -302,6 +311,11 @@ public class WrapperDetailActivity extends AppCompatActivity {
 
         }, imgUrl).launch();
 
+    }
+
+
+    public String getWrapper() {
+        return mWrapper;
     }
 
 }

@@ -24,13 +24,14 @@ import android.support.design.widget.Snackbar;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
-import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.RecyclerView.LayoutManager;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
+import com.pepperonas.aesprefs.AesPrefs;
 import io.celox.brutus.R;
 import io.celox.brutus.adapter.WrapperAdapter;
 import io.celox.brutus.model.Field;
@@ -39,7 +40,7 @@ import io.celox.brutus.model.Wrapper;
 import java.util.ArrayList;
 import java.util.List;
 
-public class MainActivity extends AppCompatActivity implements
+public class MainActivity extends SecuredAppCompatActivity implements
     NavigationView.OnNavigationItemSelectedListener {
 
     private static final String TAG = "MainActivity";
@@ -73,12 +74,11 @@ public class MainActivity extends AppCompatActivity implements
 
     }
 
-
     private void initRecyclerView() {
         mRecyclerView = (RecyclerView) findViewById(R.id.recycler_view);
 
         mWrapperAdapter = new WrapperAdapter(this, mWrappers);
-        RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(this);
+        LayoutManager layoutManager = new LinearLayoutManager(this);
         mRecyclerView.setLayoutManager(layoutManager);
         mRecyclerView.setItemAnimator(new DefaultItemAnimator());
         mRecyclerView.setAdapter(mWrapperAdapter);
@@ -100,6 +100,7 @@ public class MainActivity extends AppCompatActivity implements
         if (drawer.isDrawerOpen(GravityCompat.START)) {
             drawer.closeDrawer(GravityCompat.START);
         } else {
+            AesPrefs.putLong("lua", System.currentTimeMillis());
             super.onBackPressed();
         }
     }
@@ -119,6 +120,7 @@ public class MainActivity extends AppCompatActivity implements
 
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_settings) {
+            AesPrefs.putLong("lua",System.currentTimeMillis());
             startActivity(new Intent(this, SettingsActivity.class));
             return true;
         }

@@ -37,7 +37,6 @@ public class App extends Application {
             AesPrefs.LogMode.ALL);
 
         AndBasx.init(this);
-
-
     }
+
 }

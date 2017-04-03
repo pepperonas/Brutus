@@ -22,7 +22,6 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.net.Uri;
-import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -31,10 +30,11 @@ import android.text.TextUtils;
 import android.util.Base64;
 import android.util.Log;
 import android.view.View;
-import android.view.View.OnClickListener;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
+import com.pepperonas.aesprefs.AesPrefs;
+import com.pepperonas.andbasx.base.ToastUtils;
 import io.celox.brutus.R;
 import io.celox.brutus.crypto.Crypt;
 import io.celox.brutus.crypto.Crypt.CryptSet;
@@ -76,22 +76,22 @@ public class LoginActivity extends AppCompatActivity {
         mEtEnterPasswordAgain.setText(R.string.password_debug);
 
         Button btnSetPassword = (Button) findViewById(R.id.btn_set_password);
-        btnSetPassword.setOnClickListener(new OnClickListener() {
-            @Override
-            public void onClick(View v) {
+        btnSetPassword.setOnClickListener(v -> {
+            {
                 attemptStorePassword();
+            }
+        });
+
+        Button btnReset = (Button) findViewById(R.id.btn_reset);
+        btnReset.setOnClickListener(v -> {
+            {
+                ToastUtils.toastShort("no Action");
             }
         });
 
         mViewSetPassword = findViewById(R.id.set_password_form);
 
-
-        AsyncTask.execute(new Runnable() {
-            @Override
-            public void run() {
-                processEncryption();
-            }
-        });
+//        AsyncTask.execute(() -> processEncryption());
 
 //        processOneTimePassword("");
 
@@ -167,7 +167,7 @@ public class LoginActivity extends AppCompatActivity {
             Log.d(TAG, "proCrypt: deltaD4=" + (System.currentTimeMillis() - start) + " ms");
         }
 
-        loadPreferences();
+//        loadPreferences();
     }
 
     @SuppressWarnings("unchecked")
@@ -228,6 +228,11 @@ public class LoginActivity extends AppCompatActivity {
         }
     }
 
+    @Override
+    public void onBackPressed() {
+        finishAffinity();
+    }
+
     private void populateAutoComplete() {
         if (!mayRequestContacts()) {
             return;
@@ -256,7 +261,6 @@ public class LoginActivity extends AppCompatActivity {
         }
     }
 
-
     /**
      * Attempts to store the password.
      */
@@ -275,8 +279,24 @@ public class LoginActivity extends AppCompatActivity {
 
         if (mEtEnterPassword.getText().toString()
             .equals(mEtEnterPasswordAgain.getText().toString())) {
-            startActivity(new Intent(this, MainActivity.class));
+
+            Intent intent = new Intent(this, MainActivity.class);
+            String lastOpened = getIntent().getStringExtra("loa");
+            if (lastOpened == null
+                || lastOpened.isEmpty()
+                || lastOpened.equals("mail")) {
+                intent = new Intent(this, MainActivity.class);
+            } else if (lastOpened.equals("wrapperdetail")) {
+                intent = new Intent(this, WrapperDetailActivity.class);
+                intent.putExtra("wrapper", getIntent().getStringExtra("wrapper"));
+            } else if (lastOpened.equals("settings")) {
+                intent = new Intent(this, SettingsActivity.class);
+                intent.putExtra("panel", getIntent().getStringExtra("panel"));
+            }
+            AesPrefs.putLong("lua", System.currentTimeMillis());
+            startActivity(intent);
             finish();
+
         } else {
             mEtEnterPasswordAgain.requestFocus();
             mEtEnterPasswordAgain.setError(getString(R.string.error_password_not_matching));
